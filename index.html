@@ -1,0 +1,1358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FLOORPLAN / Embodied Learning Lab · Physics Digital Twin</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;color-scheme:dark;--bg:#080e13;--p:#101b23;--p2:#131f29;--hair:#25343f;--txt:#eaf2f3;--muted:#8295a0;--cyan:#79f0de;--gold:#efbf71;--red:#fa7676}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--txt)}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.4;cursor:default}
+.app{display:grid;width:100%;height:100dvh;grid-template-columns:238px minmax(0,1fr) 300px;grid-template-rows:58px minmax(0,1fr) 207px;overflow:hidden}
+.top{grid-area:1/1/2/4;background:#0d161d;border-bottom:1px solid var(--hair);display:flex;align-items:center;padding:0 16px;gap:15px;min-width:0}
+.brand{display:flex;align-items:center;gap:11px;min-width:210px}.logo{width:29px;height:29px;display:grid;place-items:center;background:#15352f;color:var(--cyan);border:1px solid #327569;border-radius:7px;font-size:18px;font-weight:900}.brand b{font-size:13px;letter-spacing:.13em}.brand small{display:block;font-size:9px;color:var(--muted);letter-spacing:.15em;margin-top:3px}.top .spacer{flex:1}.status{display:inline-flex;align-items:center;gap:7px;color:#a6b4bc;font-size:10px;letter-spacing:.07em;white-space:nowrap}.dot{width:7px;height:7px;border-radius:50%;background:#bd9b5f;box-shadow:0 0 9px #bd9b5f88}.dot.ok{background:var(--cyan);box-shadow:0 0 9px #79f0deaa}.dot.error{background:var(--red)}
+.btn{border:1px solid #344652;background:#172630;color:#d9e8e9;border-radius:6px;padding:8px 11px;font-size:11px;letter-spacing:.02em;white-space:nowrap}.btn:hover{background:#223743}.btn.primary{background:#12392f;border-color:#348777;color:#aaf9e9}.btn.danger{color:#ffbcbc;border-color:#6b4145;background:#2b1b21}.btn.small{padding:6px 9px;font-size:10px}.btn.active{border-color:var(--cyan);color:var(--cyan);background:#193a36}
+.sidebar{background:#0f1921;overflow-y:auto;min-height:0}.left{grid-area:2/1/4/2;border-right:1px solid var(--hair)}.right{grid-area:2/3/3/4;border-left:1px solid var(--hair)}.sidebar::-webkit-scrollbar{width:6px}.sidebar::-webkit-scrollbar-thumb{background:#33454d;border-radius:8px}
+.sec{padding:15px;border-bottom:1px solid var(--hair)}.sectitle{display:flex;align-items:center;justify-content:space-between;color:#93aab2;text-transform:uppercase;letter-spacing:.16em;font-size:10px;font-weight:750;margin-bottom:12px}.sectitle em{color:#5e737b;font-style:normal}.hint{font-size:10px;color:#718995;line-height:1.55}.palette{display:grid;grid-template-columns:1fr 1fr;gap:7px}.pal{display:flex;flex-direction:column;align-items:flex-start;gap:5px;background:#15232c;border:1px solid #293b44;border-radius:7px;color:#d6e8e6;padding:12px 10px;font-size:11px;text-align:left}.pal:hover{border-color:var(--cyan);background:#1b3339}.pal .picon{font-size:18px;line-height:1;color:#83cfc4}.entity{width:100%;display:flex;align-items:center;gap:8px;border:1px solid transparent;background:transparent;color:#b6c9d0;padding:9px 8px;border-radius:5px;text-align:left;font-size:11px}.entity:hover,.entity.selected{background:#173039;border-color:#32635d}.entity small{margin-left:auto;color:#59737d}.entity .epip{width:7px;height:7px;border-radius:2px;background:#81cabb}.entity .epip.dynamic{background:var(--gold)}.e-list{display:flex;flex-direction:column;gap:2px}.field{margin:0 0 11px}.field label{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;color:#a7b6bc;font-size:11px}.field output{font-size:10px;color:var(--cyan);font-variant-numeric:tabular-nums}.field input[type=range]{width:100%;accent-color:#7de5d7;height:13px;cursor:pointer}.field select,.field input[type=number],.field input[type=text],.field input[type=url]{width:100%;height:32px;border:1px solid #2d414b;background:#0b141c;color:#e6eeee;border-radius:5px;padding:0 8px;font-size:11px}.fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row{display:flex;gap:7px;align-items:center}.row>*{min-width:0}.split{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px}.pill{border:1px solid #35554e;border-radius:20px;padding:3px 8px;color:#8ee3d2;font-size:9px;letter-spacing:.05em}.muted{color:var(--muted)}.warning{color:#e2b782}.divider{height:1px;background:var(--hair);margin:12px 0}.tog{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#abbec3;margin-bottom:11px}.tog input{accent-color:#77d9c8}.hide{display:none!important}
+.stage{grid-area:2/2/3/3;position:relative;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#192833,#071014 75%)}#view{position:absolute;inset:0}#view canvas{display:block;width:100%;height:100%;outline:0;touch-action:none}.viewhead{position:absolute;top:15px;left:15px;display:flex;gap:8px;pointer-events:none}#viewMode{pointer-events:auto;cursor:pointer}.viewbadge{padding:7px 10px;background:#0b171fdc;border:1px solid #28414b;border-radius:5px;font-size:10px;color:#bbd5d6;letter-spacing:.05em}.reticle{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px;pointer-events:none;opacity:.68}.reticle:before,.reticle:after{content:"";position:absolute;background:#b8f6e5;box-shadow:0 0 5px #46e4c966}.reticle:before{width:1px;height:26px;left:12px}.reticle:after{height:1px;width:26px;top:12px}.focus-hud{position:absolute;bottom:16px;left:15px;background:#0b171fe8;border:1px solid #293e48;border-radius:6px;padding:9px 12px;font-size:10px;color:#9fb4bf;pointer-events:none;max-width:60%}.focus-hud b{color:var(--cyan);font-variant-numeric:tabular-nums}.help{position:absolute;bottom:16px;right:15px;font-size:10px;color:#9eb1ba;background:#0b171fcc;padding:10px 12px;border:1px solid #243640;border-radius:6px;pointer-events:none}.goal-badge{position:absolute;top:15px;right:15px;background:#103027e6;color:#adffdf;border:1px solid #327969;border-radius:6px;padding:8px 11px;font-size:10px;pointer-events:none}.goal-badge.set{color:var(--gold);border-color:#927846;background:#26251b}
+.bottom{grid-area:3/2/4/4;background:#0d161d;border-top:1px solid var(--hair);display:grid;grid-template-columns:1.1fr 1.2fr 1.6fr 1fr;min-height:0}.tile{padding:12px 14px;border-right:1px solid var(--hair);min-width:0;overflow:hidden}.tile:last-child{border-right:0}.tiletitle{font-size:9px;letter-spacing:.16em;font-weight:750;color:#8ea8b1;margin-bottom:11px}.metric{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:12px}.metric b{font-size:18px;font-weight:650;color:#e7f7f2;font-variant-numeric:tabular-nums}.metric small{font-size:9px;color:#6f8791;display:block;margin-top:3px}.meter{width:100%;height:5px;border-radius:3px;background:#253a43;overflow:hidden}.meter>div{height:100%;width:0;background:#7ff2d4;transition:width .2s}.scored{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#a6bcc2;margin:5px 0}.scored b{font-variant-numeric:tabular-nums;color:#d8f5e9}.log{font:10px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;color:#90aab2;white-space:pre-wrap;overflow:hidden;height:112px}.mini{width:100%;height:125px;display:block;background:#0b131a;border:1px solid #253741;border-radius:5px}
+.ghost-hud .fail{color:#fcaaa1}.ghost-hud .ok{color:#a0eecb}.ghost-root{pointer-events:none}#errortext{display:none;position:absolute;top:68px;left:50%;transform:translateX(-50%);max-width:min(85%,600px);padding:12px;background:#351f25;border:1px solid #bf666c;border-radius:7px;z-index:20;color:#fff1ed;font:11px/1.6 ui-monospace,monospace;white-space:pre-wrap;overflow:auto;max-height:38%;pointer-events:none}
+input[type=checkbox]{accent-color:#71e5cf}body.dragging{cursor:grabbing}::selection{background:#26756a}
+@media(max-width:1100px){.app{grid-template-columns:197px minmax(0,1fr) 260px;grid-template-rows:56px minmax(0,1fr) 187px}.bottom{grid-template-columns:1fr 1fr 1.4fr}.bottom .tile:last-child{display:none}.left .sec,.right .sec{padding:11px}.brand{min-width:165px}.top{gap:8px;padding:0 9px}.tile{padding:11px}.help{display:none}}
+@media(max-width:750px){.app{grid-template-columns:1fr 220px;grid-template-rows:52px minmax(0,1fr) 164px}.top{grid-area:1/1/2/3}.left{display:none}.stage{grid-area:2/1/3/2}.right{grid-area:2/2/3/3}.bottom{grid-area:3/1/4/3;grid-template-columns:1fr 1.45fr}.bottom .tile:nth-child(n+4){display:none}.bottom .tile:first-child{display:none}.brand{min-width:140px}.top .status:nth-of-type(2),#exportBtn,#importBtn{display:none}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script>
+<script>
+// Modules run only after their CDN dependencies resolve. Surface dependency
+// failures in the non-modal diagnostics banner instead of leaving an empty view.
+addEventListener('error',function(e){
+  const b=document.getElementById('errortext');
+  if(b){b.style.display='block';b.textContent='Runtime / module loading error: '+(e.message||'Could not load a required CDN module. Check network access.');}
+});
+addEventListener('unhandledrejection',function(e){
+  const b=document.getElementById('errortext');
+  if(b){b.style.display='block';b.textContent='Runtime initialization failure: '+String(e.reason?.message||e.reason);}
+});
+</script>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">⌑</div><div><b>FLOORPLAN / LAB</b><small>EMBODIED LEARNING / DIGITAL TWIN</small></div></div>
+    <span class="status"><i id="physicsDot" class="dot"></i><span id="physicsStatus">PHYSICS LOADING</span></span>
+    <span class="status"><i id="policyDot" class="dot"></i><span id="policyStatus">ADAPTIVE CONTROLLER</span></span>
+    <div class="spacer"></div>
+    <button class="btn primary" id="playBtn">Ⅱ &nbsp; PAUSE</button>
+    <button class="btn" id="resetBtn">↺ &nbsp; RESET</button>
+    <button class="btn" id="exportBtn">EXPORT JSON</button>
+    <button class="btn" id="importBtn">IMPORT</button><input id="importFile" type="file" accept=".json,application/json" hidden>
+  </header>
+  <aside class="sidebar left">
+    <section class="sec"><div class="sectitle">INSERT EQUIPMENT <em>ASSETS</em></div><div class="palette">
+      <button class="pal" data-add="rack"><span class="picon">▤</span>Storage rack</button>
+      <button class="pal" data-add="machine"><span class="picon">▣</span>CNC cell</button>
+      <button class="pal" data-add="pallet"><span class="picon">▥</span>Pallet stack</button>
+      <button class="pal" data-add="crate"><span class="picon">◇</span>Pushable crate</button>
+      <button class="pal" data-add="bollard"><span class="picon">◉</span>Safety bollard</button>
+      <button class="pal" data-add="conveyor"><span class="picon">▱</span>Conveyor</button>
+    </div><p class="hint">Click to insert. Select an object for translation, rotation, deletion or exact coordinates.</p></section>
+    <section class="sec"><div class="sectitle">SCENE HIERARCHY <em id="entityCount">0</em></div><div class="e-list" id="entities"></div></section>
+    <section class="sec"><div class="sectitle">EDITOR INPUT</div><div class="row"><button class="btn small active" id="toolT">MOVE [T]</button><button class="btn small" id="toolR">ROTATE [R]</button></div><p class="hint">Orbit: left-drag · Pan: right-drag · Zoom: scroll. G sets a new navigation goal. DEL removes selected equipment.</p></section>
+  </aside>
+  <main class="stage" id="stage">
+    <div id="view"></div><div class="viewhead"><div class="viewbadge">SIMULATION &nbsp; <b id="simHz">60 Hz</b></div><div class="viewbadge"> <span id="fps">--</span> FPS</div><div class="viewbadge" id="viewMode">PERSPECTIVE</div></div>
+    <div class="goal-badge" id="goalBadge">GOAL · <span id="goalCoords">-2.0, -5.2</span></div>
+    <div class="ghost-hud" id="ghostHud" style="position:absolute;top:50px;right:15px;min-width:190px;max-width:270px;background:#09171bc9;border:1px solid #385b5b;border-radius:7px;padding:10px;font:10px/1.7 ui-monospace,monospace;color:#9bd5cf;pointer-events:none">GHOST PHYSICS ENVS · IDLE</div>
+    <div id="failureToast" style="display:none;position:absolute;left:50%;top:72px;transform:translateX(-50%);background:#392325ee;border:1px solid #f48b80;border-radius:7px;padding:10px;color:#ffe1dc;font:12px ui-monospace,monospace;pointer-events:none;z-index:10"></div>
+    <div class="reticle"></div><div class="focus-hud">AF <b id="focusRead">—</b> &nbsp;|&nbsp; ƒ/<b id="afstopRead">2.0</b> &nbsp;|&nbsp; <span id="afmodeRead">RETICLE</span></div>
+    <div class="help">SELECT MORPHOLOGY → TRAIN → WATCH REAL PHYSICS ADAPTATION · G SET GOAL</div>
+    <div id="errortext"></div>
+  </main>
+  <aside class="sidebar right">
+    <section class="sec"><div class="split"><div class="sectitle" style="margin:0">INSPECTOR</div><span class="pill" id="selectedType">ROBOT</span></div><div style="font-size:14px;font-weight:650;margin:13px 0" id="selectedName">AMR / 01</div>
+      <div class="fieldgrid"><div class="field"><label>X / m</label><input type="number" id="posX" step=".1"></div><div class="field"><label>Z / m</label><input type="number" id="posZ" step=".1"></div></div>
+      <div class="field"><label>HEADING / ° <output id="rotationOut">0°</output></label><input id="rotation" type="range" min="-180" max="180" value="0"></div>
+      <div class="row"><button class="btn small" id="duplicateBtn">DUPLICATE</button><button class="btn small danger" id="deleteBtn">DELETE</button></div>
+    </section>
+    <section class="sec"><div class="sectitle">ROBOT ARCHITECTURE / MORPHOLOGY</div>
+      <div class="field"><label>PHYSICAL ROBOT TYPE</label><select id="robotType">
+        <option value="wheeled">Two-wheel differential drive</option>
+        <option value="quadruped">Quadruped · 4 legs / 12 joints</option>
+        <option value="biped">Biped · 2 legs / 12 joints</option>
+      </select></div>
+      <p class="hint" id="robotArchitecture">Loading articulated physics robot …</p>
+      <div class="row" style="margin:9px 0"><button class="btn small active" id="autoBtn">LEARNED POLICY</button><button class="btn small" id="manualBtn">MANUAL</button><button class="btn small danger" id="stopBtn">E-STOP</button></div>
+      <div class="field"><label>MAX COMMAND SPEED <output id="speedOut">1.4 m/s</output></label><input id="maxSpeed" type="range" min=".2" max="2" step=".1" value="1.4"></div>
+      <div class="field"><label>SENSOR RANGE <output id="rangeOut">3.5 m</output></label><input id="sensorRange" type="range" min="1.5" max="7" step=".5" value="3.5"></div>
+      <div class="tog"><span>Show lidar (wheeled)</span><input type="checkbox" id="showSensors" checked></div>
+      <div class="tog"><span>Show planned route</span><input type="checkbox" id="showRoute" checked></div>
+      <button class="btn small" id="setGoalBtn">⌖ &nbsp; PICK NAVIGATION GOAL [G]</button>
+      <p class="hint">Unconstrained 3D rigid bodies. Torque-capped revolute motors, ground friction, gravity, collisions. Legged turning is experimental.</p>
+    </section>
+    <section class="sec"><div class="sectitle">REINFORCEMENT LEARNING / IN BROWSER</div>
+      <div class="split"><span id="trainState" class="pill">NOT STARTED</span><span class="pill" id="policySource">BATCHED RAPIER / CEM</span></div>
+      <p class="hint">Target-conditioned, physics-evaluated gait learning. Curriculum: balance → forward gait → target turning → friction robustness. Reward includes target progress, torso height, orientation, angular velocity, foot slip and motor-demand penalties. All failed episodes reset immediately.</p>
+      <div class="field"><label>ROLLOUT POPULATION <output id="populationOut">12 / generation</output></label><input id="population" type="range" min="6" max="24" value="12" step="2"></div>
+      <div class="field"><label>CPU WORKERS <output id="workersOut">2 real workers</output></label><input id="workers" type="range" min="1" max="4" value="2" step="1"></div>
+      <div class="field"><label>CONCURRENT PHYSICS ENVS <output id="lanesOut">4 ghost robots</output></label><input id="lanes" type="range" min="2" max="8" value="4" step="1"></div>
+      <div class="tog"><span>Display physics ghost robots</span><input type="checkbox" id="showGhosts" checked></div>
+      <button class="btn primary" id="trainBtn" style="width:100%;margin:3px 0 10px">▶ TRAIN GAIT</button>
+      <div class="row"><button class="btn small" id="checkpointDownloadBtn">DOWNLOAD</button><button class="btn small" id="checkpointUploadBtn">LOAD</button><button class="btn small danger" id="checkpointClearBtn">CLEAR</button></div>
+      <input type="file" accept=".json,application/json" id="checkpointFile" hidden>
+      <p class="hint" id="checkpointInfo">IndexedDB checkpoints automatically restored per robot</p>
+      <div class="sectitle" style="margin:14px 0 7px">REWARD COMPONENTS <em>LAST TRIAL</em></div>
+      <div id="rewardBreakdown" style="font:10px/1.65 ui-monospace,monospace;color:#8eaab2">Waiting for physics trial …</div>
+      <p class="hint">Matching initial headings are evaluated for every candidate. Failure ends its episode and reconstructs the full articulated robot; policy weights persist. Training uses real parallel CPU workers when available, otherwise independent batched worlds on one worker. Checkpoints save to IndexedDB.</p>
+    </section>
+    <section class="sec"><div class="sectitle">EVENT / ENGINE LOG</div><div class="log" id="log"></div></section>
+    <section class="sec"><div class="sectitle">CAMERA / OPTICAL MODEL</div>
+      <div class="tog"><span>Gaze-point autofocus</span><input type="checkbox" id="autofocus" checked></div>
+      <div class="field"><label>Focal length <output id="focalOut">35 mm</output></label><input id="focal" type="range" min="18" max="100" step="1" value="35"></div>
+      <div class="field"><label>Aperture <output id="apertureOut">ƒ/2.0</output></label><input id="aperture" type="range" min="1.2" max="16" step=".2" value="2.0"></div>
+      <div class="field"><label>Radial CA <output id="aberrationOut">2.5 px</output></label><input id="aberration" type="range" min="0" max="10" step=".1" value="2.5"></div>
+      <div class="field"><label>CCD grain <output id="noiseOut">55%</output></label><input id="noise" type="range" min="0" max="2" step=".05" value=".55"></div>
+      <div class="field"><label>Lens blur cap <output id="blurOut">20 px</output></label><input id="blur" type="range" min="0" max="45" step="1" value="20"></div>
+      <div class="tog"><span>Depth-of-field rendering</span><input type="checkbox" id="dof" checked></div>
+      <div class="tog"><span>Sensor simulation</span><input type="checkbox" id="ccd" checked></div>
+      <div class="field"><label>Render resolution</label><select id="resolution"><option value=".65">65% · fast</option><option value=".8" selected>80% · balanced</option><option value="1">100% · full</option></select></div>
+    </section>
+  </aside>
+  <section class="bottom">
+    <div class="tile"><div class="tiletitle">ROBOT TELEMETRY</div><div class="metric"><div><b id="linearRead">0.00</b><small>VELOCITY m/s</small></div><div><b id="turnRead">0.00</b><small>YAW rad/s</small></div><div><b id="distRead">—</b><small>TO GOAL m</small></div></div><div class="scored"><span>Nearest lidar obstacle</span><b id="lidarRead">—</b></div><div class="meter"><div id="sensorBar"></div></div><div class="hint" id="robotState" style="margin-top:8px">Initializing physics …</div></div>
+    <div class="tile"><div class="tiletitle">LEARNING / TARGET & STABILITY</div>
+      <div class="metric"><div><b id="trainGeneration">0</b><small>GENERATIONS</small></div><div><b id="trainEpisodes">0</b><small>PHYSICS TRIALS</small></div><div><b id="trainBest">—</b><small>BEST REWARD</small></div></div>
+      <div class="scored"><span>Curriculum</span><b id="trainStage">BALANCE</b></div>
+      <div class="scored"><span>Upright / stable</span><b id="trainUpright">—</b></div>
+      <div class="scored"><span>Goal progress / success</span><b id="trainProgress">—</b></div>
+      <div class="scored"><span>Tilt RMS / fall rate</span><b id="trainTilt">—</b></div>
+      <div class="scored"><span>Holdout friction reward</span><b id="trainRobust">—</b></div>
+      <div class="scored"><span>Resets / failed trials</span><b id="resetCount">0 / 0</b></div>
+      <div class="scored"><span>Torso height RMS error</span><b id="heightError">—</b></div>
+      <div class="scored"><span>Average trial lifetime</span><b id="trainLife">—</b></div>
+      <div class="scored"><span>Motor PD demand proxy</span><b id="torqueDemand">—</b></div>
+      <div class="meter"><div id="torqueBar" style="background:#e6aa72"></div></div>
+      <div class="hint" style="margin-top:5px">Motor demand is a clipped PD estimate, <b>not measured solver torque (Nm)</b>.</div>
+      <div class="hint" id="learningBackend">Rapier WASM · curriculum evolution</div>
+      <div class="hide" id="trainPrediction"></div><div id="runtimeInfo" class="hide"></div><span id="confidenceRead" class="hide"></span><div id="confidenceBar" class="hide"></div><span id="modelOutput" class="hide"></span><span id="actionRead" class="hide"></span><span id="policyBytes" class="hide"></span></div>
+    <div class="tile"><div class="tiletitle">TRIAL-AND-ERROR LEARNING CURVE · REWARD</div><canvas id="learningChart" class="mini" width="460" height="138" aria-label="Physics trial training reward graph"></canvas></div>
+    <div class="tile"><div class="tiletitle">OCCUPANCY / PLAN VIEW</div><canvas id="minimap" class="mini" width="330" height="132"></canvas></div>
+  </section>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {TransformControls} from 'three/addons/controls/TransformControls.js';
+const $=id=>document.getElementById(id); const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const lerp=(a,b,t)=>a+(b-a)*t;
+const escapeHTML=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S={focal:35,aperture:2.0,focus:13,targetFocus:13,aberration:2.5,maxBlur:20,samples:32,scale:.8,enabled:true,debug:0,ccdEnabled:true,signal18:1600,noiseStrength:.55,chromaNoise:.36,readNoise:4,prnu:.35,banding:.14,darkCurrent:.3,exposureSec:.08,hotPixels:0,cosmicRate:0,adcBits:14,ccdFreeze:false,ccdHz:24};
+const sensorWidthMM=36,sensorHeightMM=24;
+let RAPIER,world,policy=null,paused=false,autonomous=true,estop=false,settingGoal=false,selected=null,robot=null;
+let uid=1,goal={x:-2,z:-5.25},path=[],waypoint=0,needReplan=true,planCountdown=0,decisionClock=0,clockAccum=0;
+const objects=[],sensorReadings=[3.5,3.5,3.5,3.5,3.5],beamAngles=[-1.16,-.58,0,.58,1.16];
+const actions=['CRUISE','ARC LEFT','ARC RIGHT','TURN LEFT','TURN RIGHT','ARRIVED'];
+let drive={v:0,w:0,action:5,confidence:0},actualSpeed=0,lastForward=0,lastPos=null,stuck=0;
+let frame=0,frames=0,statsT=performance.now(),lastTick=performance.now();const keys={};
+const logHistory=[];function log(m){let t=new Date().toLocaleTimeString('en-US',{hour12:false});logHistory.unshift(`[${t}] ${m}`);logHistory.length=Math.min(7,logHistory.length);$('log').textContent=logHistory.join('\n');}
+function status(dot,text,state){$(dot+'Dot').className='dot '+state;$(dot+'Status').textContent=text;}
+function warn(text){console.error(text);$('errortext').textContent=String(text).slice(0,1800);$('errortext').style.display='block';log(String(text).slice(0,135));}
+window.addEventListener('error',e=>warn(e.message||e.error));window.addEventListener('unhandledrejection',e=>warn(e.reason?.message||e.reason));
+const view=$('view'),stage=$('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(1);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.NoToneMapping;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
+view.appendChild(renderer.domElement);
+let shaderFault=null;
+renderer.debug.onShaderError=(gl,program,vertexShader,fragmentShader)=>{
+  shaderFault=[gl.getProgramInfoLog(program),gl.getShaderInfoLog(vertexShader),gl.getShaderInfoLog(fragmentShader)].filter(Boolean).join('\n')||'Shader compilation failed';
+  warn('Lens shader issue, using direct rendering: '+shaderFault.slice(0,800));
+};
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b1620);scene.fog=new THREE.FogExp2(0x0b1620,.012);
+const camera=new THREE.PerspectiveCamera(42,1,.1,130);camera.position.set(10,11,15);
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.dampingFactor=.08;orbit.target.set(0,.8,0);orbit.maxPolarAngle=1.48;orbit.minDistance=3;orbit.maxDistance=40;orbit.update();
+const transform=new TransformControls(camera,renderer.domElement);scene.add(transform.getHelper());transform.setSize(.75);
+transform.addEventListener('dragging-changed',e=>{orbit.enabled=!e.value;document.body.classList.toggle('dragging',e.value);if(!e.value){needReplan=true;refreshInspector();}});
+transform.addEventListener('objectChange',()=>{if(selected?.body){const p=selected.mesh.position,q=selected.mesh.quaternion;selected.body.setTranslation({x:p.x,y:p.y,z:p.z},true);selected.body.setRotation(q,true);needReplan=true;}refreshInspector();});
+scene.add(new THREE.HemisphereLight(0xc2e2ec,0x1b2936,2.0));
+const keyLight=new THREE.DirectionalLight(0xe6f2fa,3.6);keyLight.position.set(-8,17,6);keyLight.castShadow=true;keyLight.shadow.mapSize.set(2048,2048);keyLight.shadow.camera.left=-22;keyLight.shadow.camera.right=22;keyLight.shadow.camera.top=22;keyLight.shadow.camera.bottom=-22;keyLight.shadow.camera.far=65;keyLight.shadow.bias=-.00018;scene.add(keyLight);
+scene.add(new THREE.AmbientLight(0x84a6b9,.30));
+const mat=(c,m=.1,r=.65)=>new THREE.MeshStandardMaterial({color:c,metalness:m,roughness:r});
+const mFloor=mat(0x1c2b36,.25,.8),mSteel=mat(0x586c77,.65,.42),mDark=mat(0x172630,.42,.55),mTeal=mat(0x4acdb7,.47,.4),mOrange=mat(0xeaa65f,.38,.54),mBox=mat(0xa0a58e,.10,.83),mBlue=mat(0x4a6f89,.55,.52),mEdge=new THREE.MeshBasicMaterial({color:0x91f1dc});
+function meshBox(group,sx,sy,sz,x,y,z,material,cast=true){const o=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);o.position.set(x,y,z);o.castShadow=cast;o.receiveShadow=true;group.add(o);return o;}
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(18,14),mFloor);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+const grid=new THREE.GridHelper(18,36,0x41545e,0x344754);grid.position.y=.008;grid.scale.z=14/18;scene.add(grid);
+const boundary=new THREE.Group();scene.add(boundary);
+for(const [sx,sz,x,z] of [[18,.22,0,-6.98],[18,.22,0,6.98],[.22,14,-8.98,0],[.22,14,8.98,0]]){
+  const w=meshBox(boundary,sx,.65,sz,x,.32,z,mat(0x293d4c,.42,.62));w.castShadow=true;
+}
+// Overhead beams, hazard tape and lights are decorative geometry, not sensors.
+for(let x=-7;x<=7;x+=3.5){const lamp=new THREE.Mesh(new THREE.BoxGeometry(.12,.045,1.15),new THREE.MeshBasicMaterial({color:0x70ddce}));lamp.position.set(x,3.8,0);lamp.visible=false;scene.add(lamp);}
+const goalMarker=new THREE.Group();scene.add(goalMarker);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(.43,.035,8,46),new THREE.MeshBasicMaterial({color:0x9bffe0}));ring.rotation.x=-Math.PI/2;ring.position.y=.055;goalMarker.add(ring);
+const goalPin=new THREE.Mesh(new THREE.ConeGeometry(.16,.46,12),mTeal);goalPin.position.y=.38;goalMarker.add(goalPin);
+const goalLight=new THREE.PointLight(0x4dffbc,9,2.5);goalLight.position.y=.55;goalMarker.add(goalLight);
+const pathLine=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x80ffd4,transparent:true,opacity:.7}));scene.add(pathLine);
+const rayLines=new THREE.Group();scene.add(rayLines);
+for(let i=0;i<5;i++){const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:i===2?0x79ffcc:0x59bdd3,transparent:true,opacity:.75}));rayLines.add(line);}
+const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();
+function genRoot(type){const g=new THREE.Group();g.userData.entityType=type;return g;}
+function addVisual(type,g,w,h,d){
+ if(type==='rack'){
+  meshBox(g,w,.12,d,0,.10,0,mDark);
+  for(const x of [-w*.44,w*.44])for(const z of [-d*.42,d*.42])meshBox(g,.09,2.65,.09,x,1.4,z,mSteel);
+  for(const y of [.65,1.45,2.35]){meshBox(g,w-.15,.09,d-.06,0,y,0,mBlue);
+    for(let i=0;i<3;i++)meshBox(g,w*.24,.34,d*.53,-w*.28+i*w*.28,y+.22,0,i%2?mBox:mOrange);}
+ }else if(type==='machine'){
+  meshBox(g,w,1.5,d,0,.78,0,mBlue);
+  meshBox(g,w*.78,.75,d*.65,0,1.85,-.07,mSteel);
+  meshBox(g,w*.6,.7,.04,0,1.07,d*.5+.025,mDark);
+  meshBox(g,.38,.42,.035,w*.25,1.1,d*.55,mTeal);
+  meshBox(g,.17,.09,.16,-w*.32,2.25,0,mOrange);
+ }else if(type==='conveyor'){
+  meshBox(g,w,.21,d,0,.9,0,mSteel);meshBox(g,w*.94,.045,d*.88,0,1.04,0,mDark);
+  for(const x of [-w*.44,w*.44])for(const z of [-d*.41,d*.41])meshBox(g,.11,.9,.11,x,.44,z,mSteel);
+  for(let x=-w*.4;x<w*.48;x+=.25)meshBox(g,.018,.018,d*.78,x,1.08,0,mTeal,false);
+ }else if(type==='pallet'){
+  for(const z of [-.33,0,.33])meshBox(g,w,.12,.16,0,.12,z,mBox);
+  meshBox(g,w,.18,d,0,.27,0,mOrange);
+  for(let j=0;j<3;j++)meshBox(g,w*.27,.39,d*.38,-w*.3+j*w*.3,.55,0,mBox);
+ }else if(type==='crate'){
+  meshBox(g,w,h,d,0,0,0,mOrange);
+  for(let y of [-h*.41,h*.41]){meshBox(g,w*.98,.035,.04,0,y,d*.51,mDark,false);meshBox(g,w*.98,.035,.04,0,y,-d*.51,mDark,false);}
+ }else if(type==='bollard'){
+  const c=new THREE.Mesh(new THREE.CylinderGeometry(.115,.15,1.15,14),mOrange);c.position.y=.58;c.castShadow=true;g.add(c);
+  const top=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.13,14),mSteel);top.position.y=1.12;g.add(top);
+ }
+}
+const shapeConfig={rack:[2.35,2.65,1.05],machine:[1.8,2.2,1.65],pallet:[1.2,.78,.95],crate:[.65,.65,.65],bollard:[.32,1.2,.32],conveyor:[2.7,1.1,1.1]};
+function createEntity(type,x,z,rotation=0,name){
+ if(!world)return;const dims=shapeConfig[type],isDynamic=type==='crate';if(!dims)return;
+ const [w,h,d]=dims,y=isDynamic?h/2:(type==='pallet'?.005:0);
+ const g=genRoot(type);g.position.set(x,y,z);g.rotation.y=rotation;scene.add(g);addVisual(type,g,w,h,d);
+ let desc=isDynamic?RAPIER.RigidBodyDesc.dynamic().setTranslation(x,y,z).setLinearDamping(1).setAngularDamping(1.2):RAPIER.RigidBodyDesc.fixed().setTranslation(x,y,z);
+ desc.setRotation({x:0,y:Math.sin(rotation/2),z:0,w:Math.cos(rotation/2)});
+ const body=world.createRigidBody(desc);
+ // Static-equipment visual origin is floor level. Collider center must match it.
+ const halfy=isDynamic?h/2:(type==='rack'?1.32:type==='machine'?1.1:type==='conveyor'?.75:type==='bollard'?.6:.38);
+ const height=isDynamic?h:(type==='pallet'?.76:type==='conveyor'?1.5:h);
+ const collider=RAPIER.ColliderDesc.cuboid(w/2,height/2,d/2).setTranslation(0,isDynamic?0:halfy,0).setFriction(1.35).setRestitution(.04);
+ world.createCollider(collider,body);
+ const entity={id:uid++,type,name:name||`${type.toUpperCase()} / ${String(uid-1).padStart(2,'0')}`,mesh:g,body,dims:[w,height,d],dynamic:isDynamic};
+ g.traverse(o=>{o.userData.entity=entity;});objects.push(entity);drawEntities();needReplan=true;return entity;
+}
+// Shared, actual Rapier articulation and controllers. Serialized into the training worker.
+function buildRig(RP, world, kind, x=0, z=0, yaw=0) {
+  const links=[], joints=[], motors=[], axis={x:1,y:0,z:0};
+  const cy=Math.cos(yaw), sx=Math.sin(yaw);
+  function worldPt(px,py,pz) {return {x:x+px*cy+pz*sx,y:py,z:z-px*sx+pz*cy};}
+  const initialRot={x:0,y:Math.sin(yaw*.5),z:0,w:Math.cos(yaw*.5)};
+  function part(name,shape,pos,size,mass,friction=1.35){
+    const p=worldPt(...pos);
+    const rb=world.createRigidBody(RP.RigidBodyDesc.dynamic().setTranslation(p.x,p.y,p.z).setRotation(initialRot).setCanSleep(false).setLinearDamping(.12).setAngularDamping(.20));
+    let cd;
+    if(shape==='wheel') {
+      cd=RP.ColliderDesc.cylinder(size[0],size[1]).setRotation({x:0,y:0,z:Math.SQRT1_2,w:Math.SQRT1_2});
+    } else cd=RP.ColliderDesc.cuboid(size[0]/2,size[1]/2,size[2]/2);
+    world.createCollider(cd.setMass(mass).setFriction(friction).setRestitution(0).setCollisionGroups(0x00020001),rb);
+    let lk={name,shape,body:rb,size,mass};links.push(lk);return lk;
+  }
+  function revolute(name,parent,child,pAnchor,cAnchor,lim,role,side=0,phase=0,axisOverride=axis){
+    const jd=RP.JointData.revolute({x:pAnchor[0],y:pAnchor[1],z:pAnchor[2]},{x:cAnchor[0],y:cAnchor[1],z:cAnchor[2]},axisOverride);
+    const joint=world.createImpulseJoint(jd,parent.body,child.body,true);
+    if(joint.setContactsEnabled)joint.setContactsEnabled(false);
+    if(lim&&joint.setLimits)joint.setLimits(lim[0],lim[1]);
+    const m={name,joint,role,side,phase,parent:parent.body,child:child.body,axis:axisOverride};joints.push(m);motors.push(m);return m;
+  }
+  let root;
+  if(kind==='wheeled'){
+    root=part('chassis','box',[0,.47,0],[.78,.24,1.06],9.0,.9);
+    for(const s of [-1,1]){
+      const wheel=part('wheel'+s,'wheel',[s*.49,.31,0],[.095,.30,0],1.2,2.5);
+      revolute('drive'+s,root,wheel,[s*.49,-.16,0],[0,0,0],null,'wheel',s);
+    }
+    world.createCollider(RP.ColliderDesc.ball(.095).setTranslation(0,-.37,.40).setFriction(1.5).setCollisionGroups(0x00020001),root.body);
+  } else if(kind==='quadruped'){
+    root=part('torso','box',[0,.68,0],[.72,.22,.92],11.0,.9);
+    for(const side of [-1,1])for(const fore of [1,-1]){
+      const tag=(fore>0?'front':'rear')+(side<0?'L':'R'),px=side*.32,pz=fore*.32;
+      const yoke=part(tag+' hip abduction','box',[px,.60,pz],[.12,.10,.13],.32);
+      const upper=part(tag+' thigh','box',[px,.45,pz],[.13,.32,.14],.65);
+      const lower=part(tag+' shin','box',[px,.15,pz],[.11,.29,.12],.52);
+      world.createCollider(RP.ColliderDesc.cuboid(.11,.035,.17).setTranslation(0,-.145,.075).setFriction(2.4).setMass(.10).setCollisionGroups(0x00020001),lower.body);
+      const legPhase=(side===fore)?Math.PI:0;
+      revolute(tag+' hip roll',root,yoke,[px,-.06,pz],[0,.02,0],[-.65,.65],'hipRoll',side,legPhase,{x:0,y:0,z:1});
+      revolute(tag+' hip pitch',yoke,upper,[0,0,0],[0,.16,0],[-.9,.9],'hip',side,legPhase);
+      revolute(tag+' knee',upper,lower,[0,-.16,0],[0,.145,0],[-.1,1.6],'knee',side,legPhase);
+    }
+  } else if(kind==='biped'){
+    root=part('pelvis + torso','box',[0,1.10,0],[.49,.54,.30],13.0,.8);
+    for(const side of [-1,1]){
+      const tag=side<0?'left':'right',px=side*.17,phase=side<0?0:Math.PI;
+      const hipYaw=part(tag+' hip yaw joint','box',[px,.92,0],[.105,.08,.12],.22);
+      const hipRoll=part(tag+' hip roll joint','box',[px,.92,0],[.105,.08,.12],.22);
+      const thigh=part(tag+' thigh','box',[px,.72,0],[.16,.40,.18],1.55);
+      const shank=part(tag+' shank','box',[px,.32,0],[.14,.39,.16],.95);
+      const ankleRoll=part(tag+' ankle carrier','box',[px,.12,0],[.12,.09,.13],.20);
+      const foot=part(tag+' foot','box',[px,.087,.10],[.18,.105,.31],.45,2.6);
+      revolute(tag+' hip yaw',root,hipYaw,[px,-.18,0],[0,0,0],[-.65,.65],'hipYaw',side,phase,{x:0,y:1,z:0});
+      revolute(tag+' hip roll',hipYaw,hipRoll,[0,0,0],[0,0,0],[-.65,.65],'hipRoll',side,phase,{x:0,y:0,z:1});
+      revolute(tag+' hip pitch',hipRoll,thigh,[0,0,0],[0,.20,0],[-1.0,1.0],'hip',side,phase);
+      revolute(tag+' knee',thigh,shank,[0,-.20,0],[0,.195,0],[-.05,1.65],'knee',side,phase);
+      revolute(tag+' ankle pitch',shank,ankleRoll,[0,-.195,0],[0,0,0],[-.8,.8],'ankle',side,phase);
+      revolute(tag+' ankle roll',ankleRoll,foot,[0,0,0],[0,.035,-.10],[-.55,.55],'ankleRoll',side,phase,{x:0,y:0,z:1});
+    }
+  } else throw Error('Unsupported robot morphology '+kind);
+  return {kind,root:root.body,rootPart:root,links,joints,motors,start:{x,z,yaw},clock:0};
+}
+// Convert world angular velocity into body coordinates without a Three.js dependency.
+function THREE_SAFE_VECTOR(x,y,z,q){
+ const ix=-q.x,iy=-q.y,iz=-q.z,iw=q.w;
+ const tx=2*(iy*z-iz*y),ty=2*(iz*x-ix*z),tz=2*(ix*y-iy*x);
+ return {x:x+iw*tx+iy*tz-iz*ty,y:y+iw*ty+iz*tx-ix*tz,z:z+iw*tz+ix*ty-iy*tx};
+}
+function rigSensors(rig){
+  const b=rig.root,p=b.translation(),q=b.rotation(),v=b.linvel(),a=b.angvel();
+  const up=1-2*(q.x*q.x+q.z*q.z);
+  const forwardY=2*(q.y*q.z-q.w*q.x);
+  const rightY=2*(q.x*q.y+q.z*q.w);
+  const pitch=Math.atan2(-forwardY,Math.max(.01,Math.sqrt(Math.max(0,1-forwardY*forwardY))));
+  const roll=Math.atan2(rightY,up);
+  const fwdX=2*(q.x*q.z+q.w*q.y),fwdZ=1-2*(q.x*q.x+q.y*q.y);
+  const vel=v.x*fwdX+v.z*fwdZ;
+  const upright=Math.max(-1,Math.min(1,up));
+  const localRate=new THREE_SAFE_VECTOR(a.x,a.y,a.z,q);
+  return {x:p.x,y:p.y,z:p.z,vel,forwardX:fwdX,forwardZ:fwdZ,
+    verticalSpeed:v.y,lateralSpeed:v.x*fwdZ-v.z*fwdX,
+    pitch,roll,upright,pitchRate:localRate.x,rollRate:localRate.z,
+    yawRate:a.y};
+}
+function seedVector(kind){
+  if(kind==='wheeled')return [0.15,0.1,0.05,0.05,0,0,0,0,0,0,0,0];
+  // Start near a quiet standing posture. Swing only begins when velocity is requested.
+  if(kind==='quadruped')return [-.18,-.72,-.78,0,-.96,.40,.50,0,-.35,-.35,.42,0];
+  return [-.20,-.78,-.70,0,-.87,.53,.67,0,-.42,-.30,.57,0];
+}
+function estimateMotorDemand(m,target,kp,kd,cap){
+ // Compute demand from observed relative joint orientation and angular rate.
+ // Rapier's default acceleration-based motors scale with body inertia; this
+ // value is an explicitly labeled demand proxy, not measured actuator torque.
+ const p=m.parent.rotation(),q=m.child.rotation(),a=m.axis;
+ const rx=-p.x*q.w+p.w*q.x-p.y*q.z+p.z*q.y;
+ const ry=-p.y*q.w+p.w*q.y-p.z*q.x+p.x*q.z;
+ const rz=-p.z*q.w+p.w*q.z-p.x*q.y+p.y*q.x;
+ const rw=p.w*q.w+p.x*q.x+p.y*q.y+p.z*q.z;
+ let jointAngle=2*Math.atan2(rx*a.x+ry*a.y+rz*a.z,rw);
+ if(jointAngle>Math.PI)jointAngle-=2*Math.PI;
+ if(jointAngle< -Math.PI)jointAngle+=2*Math.PI;
+ const u=new THREE_SAFE_VECTOR(a.x,a.y,a.z,{x:-p.x,y:-p.y,z:-p.z,w:p.w});
+ // THREE_SAFE_VECTOR applies quaternion inverse, so use the original quaternion
+ // to rotate local axis to world (pass its conjugate).
+ const w1=m.parent.angvel(),w2=m.child.angvel();
+ const rate=(w2.x-w1.x)*u.x+(w2.y-w1.y)*u.y+(w2.z-w1.z)*u.z;
+ return Math.max(-cap,Math.min(cap,kp*(target-jointAngle)-kd*rate));
+}
+function driveRig(rig,theta,t,command={}){
+  const s=rigSensors(rig),K=i=>Math.max(-1,Math.min(1,theta[i]||0));
+  const steer=Math.max(-1,Math.min(1,Number(command.turn)||0));
+  const throttle=Math.max(-1,Math.min(1,(command.throttle===undefined?1:Number(command.throttle))));
+  if(rig.kind==='wheeled'){
+    const base=(3.5+5.5*(K(0)+1)*.5)*throttle;
+    const turn=steer*(.65+4*(K(1)+1)*.5);
+    const feedback=(K(2)+1)*.75;
+    let demand=0;const actions=[];
+    for(const m of rig.motors){
+      const target=-(base-m.side*turn)*(1-feedback*.16*Math.abs(s.yawRate));
+      m.joint.configureMotorVelocity(target,5.5);
+      if(m.joint.setMotorMaxForce)m.joint.setMotorMaxForce(65);
+      actions.push(target);
+      demand+=Math.min(65,Math.abs(target)*5.5);
+    }
+    return {effort:Math.abs(base)+Math.abs(turn),state:s,actions,torqueDemand:demand/rig.motors.length};
+  }
+  const frequency=.65+1.25*(K(0)+1)*.5;
+  const activity=Math.min(1,Math.abs(throttle));
+  const stride=(.10+.72*(K(1)+1)*.5)*throttle;
+  const lift=(.06+1.05*(K(2)+1)*.5)*activity;
+  const hipBase=.15*K(3);
+  const kneeBase=.02+.31*(K(4)+1)*.5;
+  const pitchGain=.25+1.4*(K(5)+1)*.5;
+  const damp=.05+.28*(K(6)+1)*.5;
+  const phaseOffset=K(7)*.6;
+  const ankleGain=.35+.45*(K(8)+1)*.5;
+  const stance=.65+.4*(K(9)+1)*.5;
+  const rollGain=.05+.4*(K(10)+1)*.5;
+  const kneeShift=K(11)*.4;
+  const stabilizer=Math.max(-.6,Math.min(.6,-pitchGain*s.pitch-damp*s.pitchRate));
+  let effort=0,torqueDemand=0;const actions=[];
+  for(const m of rig.motors){
+    const phi=t*frequency*2*Math.PI+m.phase+phaseOffset;
+    // Contact-rich position-control policy. Each motor target changes actual
+    // joint angles; all motion, gravity and floor reaction arise from Rapier.
+    let target=0;
+    const balance=stabilizer - m.side*rollGain*s.roll;
+    if(m.role==='hip')target=hipBase+stride*Math.sin(phi)*stance+balance+steer*m.side*.17;
+    if(m.role==='knee')target=kneeBase+lift*Math.max(0,Math.sin(phi+kneeShift+.9));
+    if(m.role==='ankle')target=-ankleGain*(hipBase+stride*Math.sin(phi)+balance)-.30*(kneeBase+lift*Math.max(0,Math.sin(phi+.9)));
+    if(m.role==='hipRoll')target=m.side*.11-rollGain*s.roll - .07*s.rollRate + activity*m.side*.07*Math.sin(phi);
+    if(m.role==='hipYaw')target=-steer*.26+activity*m.side*.035*Math.sin(phi);
+    if(m.role==='ankleRoll')target=-m.side*.09+rollGain*.65*s.roll+.07*s.rollRate;
+    const low=m.role==='knee'?-.05:m.role==='hipRoll'||m.role==='hipYaw'||m.role==='ankleRoll'?-.55:m.role==='ankle'?-.75:-.95;
+    const high=m.role==='knee'?1.5:m.role==='hipRoll'||m.role==='hipYaw'||m.role==='ankleRoll'?.55:m.role==='ankle'?.75:.95;
+    target=Math.max(low,Math.min(high,target));
+    const kp=rig.kind==='biped'?108:100,kd=rig.kind==='biped'?15:13,cap=rig.kind==='biped'?135:110;
+    m.joint.configureMotorPosition(target,kp,kd);
+    if(m.joint.setMotorMaxForce)m.joint.setMotorMaxForce(cap);
+    torqueDemand+=Math.abs(estimateMotorDemand(m,target,kp,kd,cap));
+    effort+=Math.abs(target);actions.push(target);
+  }
+  return {effort:effort/rig.motors.length,torqueDemand:torqueDemand/rig.motors.length,state:s,actions};
+}
+
+function destroyRobotRig(){
+ if(!rig||!world)return;
+ if(robot?.mesh)scene.remove(robot.mesh);
+ for(const lk of rig.links){try{world.removeRigidBody(lk.body);}catch(e){}}
+ rig=null;robot=null;rigVisuals=[];selected=null;
+}
+function makeRobot(x=0,z=4.4,yaw=Math.PI){
+ if(!world)return null;
+ rig=buildRig(RAPIER,world,currentKind,x,z,yaw);
+ const group=genRoot('robot');scene.add(group);rigVisuals=[];
+ for(const link of rig.links){
+  let geometry,material=link.name.includes('wheel')?mat(0x11181c,.05,.95):link.name.includes('foot')?mOrange:link.name.includes('torso')||link.name.includes('chassis')?mTeal:mSteel;
+  if(link.shape==='wheel')geometry=new THREE.CylinderGeometry(link.size[1],link.size[1],link.size[0]*2,24);
+  else geometry=new THREE.BoxGeometry(...link.size);
+  const visual=new THREE.Mesh(geometry,material);visual.castShadow=true;visual.receiveShadow=true;
+  group.add(visual);rigVisuals.push({link,visual,localQuat:link.shape==='wheel'?new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),Math.PI/2):new THREE.Quaternion()});
+ }
+ const robotName=currentKind==='wheeled'?'AMR / WHEELED':currentKind==='quadruped'?'QUAD / FOUR-LEGGED':'BIPED / WALKER';
+ robot={id:0,type:'robot',name:robotName,mesh:group,body:rig.root,dims:[1,.6,1.2],dynamic:true};
+ group.traverse(o=>o.userData.entity=robot);
+ syncRigVisuals();drawEntities();
+ $('robotArchitecture').textContent=`${currentKind.toUpperCase()} · ${rig.links.length} rigid links · ${rig.motors.length} motorized revolute joints`;
+ return robot;
+}
+function syncRigVisuals(){if(!rig||!robot)return;
+ const p=rig.root.translation(),q=rig.root.rotation();const rootQ=new THREE.Quaternion(q.x,q.y,q.z,q.w),inv=rootQ.clone().invert();
+ robot.mesh.position.set(p.x,p.y,p.z);robot.mesh.quaternion.copy(rootQ);
+ for(const {link,visual,localQuat} of rigVisuals){const t=link.body.translation(),r=link.body.rotation();
+  visual.position.set(t.x-p.x,t.y-p.y,t.z-p.z).applyQuaternion(inv);
+  visual.quaternion.copy(inv).multiply(new THREE.Quaternion(r.x,r.y,r.z,r.w)).multiply(localQuat);
+ }
+}
+const TRAINER_BODY="// Physics-based v4 trainer, inlined into the standalone HTML at build time.\n// Each evaluator runs independent Rapier worlds; separate dedicated workers execute on CPU cores.\n// A single-worker batched fallback is available. WebGPU is not used by physics.\nlet RP=null, training=false, requestedKind=null, episodeCount=0, failureCount=0, resetCount=0;\nlet evaluatorSource=null,workerPool=null,poolDisabled=false,workerCount=2;\nconst STAGE_NAMES=['BALANCE','FORWARD','TARGET','ROBUST'];\nconst sleep=()=>new Promise(r=>setTimeout(r,0));\nconst limit=(v,a,b)=>Math.max(a,Math.min(b,v));\nfunction normal(){const u=Math.random()||1e-9,v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}\nfunction median(a){const z=[...a].sort((a,b)=>a-b);return z[Math.floor(z.length/2)]||0;}\nasync function initialize(){\n const urls=['https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.21.0/dist/rapier.mjs','https://esm.sh/@dimforge/rapier3d-compat@0.21.0'];let err;\n for(const u of urls)try{const mod=await import(u);RP=mod.default||mod;if(typeof RP.init==='function')await RP.init();if(typeof RP.World==='function')return;}catch(e){err=e;}\n throw err||Error('Rapier physics unavailable');\n}\nfunction goalFor(stage,scenario,yaw,kind){\n if(stage===0)return {x:0,z:0};\n const forward=kind==='wheeled'?3.2:2.3;\n let dx=0,dz=stage===1?forward:stage===2?2.6:3.0;\n if(stage===2)dx=scenario%2===0?1.6:-1.6;\n if(stage===3)dx=[1.8,-1.8,0.3][scenario%3];\n return {x:dx*Math.cos(yaw)+dz*Math.sin(yaw),z:dz*Math.cos(yaw)-dx*Math.sin(yaw)};\n}\nfunction command(s,goal,stage){\n if(stage===0)return {throttle:0,turn:0,angle:0,distance:0};\n const dx=goal.x-s.x,dz=goal.z-s.z,dist=Math.hypot(dx,dz);\n const fx=s.forwardX??0,fz=s.forwardZ??1;\n const angle=Math.atan2(dx*fz-dz*fx,dx*fx+dz*fz);\n return {throttle:dist<.38?0:limit((dist-.30)*.85,0,1)*limit(1-Math.abs(angle)*.48,.16,1),turn:limit(angle*1.55,-1,1),angle,distance:dist};\n}\nfunction footSlip(rig){\n if(rig.kind==='wheeled')return 0;\n let total=0,count=0;\n for(const l of rig.links){\n  if(!(l.name.endsWith(' foot')||l.name.endsWith(' shin')))continue;\n  const p=l.body.translation(),v=l.body.linvel(),bottom=p.y-(l.name.endsWith(' foot')?.055:.145);\n  if(bottom<.08){total+=Math.hypot(v.x,v.z);count++;}\n }\n return count?total/count:0;\n}\nfunction failureReason(kind,s,elapsed,dt,badTime){\n if(![s.x,s.y,s.z,s.pitch,s.roll,s.upright,s.vel,s.pitchRate,s.rollRate].every(Number.isFinite))return 'NUMERIC DIVERGENCE';\n if(Math.abs(s.x)>13||Math.abs(s.z)>13)return 'ESCAPED TRAINING ZONE';\n const nominal=kind==='biped'?1.10:kind==='quadruped'?.68:.47;\n const hard=kind==='biped'?.56:kind==='quadruped'?.34:.26;\n if(s.y<hard)return 'CATASTROPHIC TORSO COLLAPSE';\n if(s.upright<.38||Math.abs(s.pitch)>1.25||Math.abs(s.roll)>1.25)return 'TORSO OVERTURN';\n const unstable=s.y<nominal*.71||s.upright<.72||Math.abs(s.pitch)>.74||Math.abs(s.roll)>.74;\n if(elapsed>.18 && badTime+(unstable?dt:0)>.13)return 'SUSTAINED TORSO DESTABILIZATION';\n return null;\n}\nfunction makeTrial(kind,theta,stage,scenario,yaw,friction,id){\n const world=new RP.World({x:0,y:-9.81,z:0});world.timestep=1/60;\n world.createCollider(RP.ColliderDesc.cuboid(20,.2,20).setTranslation(0,-.21,0).setFriction(friction));\n const rig=buildRig(RP,world,kind,0,0,yaw),initial=rigSensors(rig),goal=goalFor(stage,scenario,yaw,kind);\n const distance=stage===0?0:Math.hypot(goal.x-initial.x,goal.z-initial.z);\n return {id,world,rig,theta,stage,scenario,yaw,friction,goal,initial,distance,prevDistance:distance,\n  elapsed:0,badTime:0,step:0,done:false,reason:null,reached:false,effort:0,torqueDemand:0,actionDelta:0,prevActions:null,\n  progress:0,uprightSeconds:0,stableSeconds:0,tiltSum:0,heightSum:0,verticalSum:0,slipSum:0,\n  p:{progress:0,alive:0,height:0,posture:0,tracking:0,heading:0,stability:0,slip:0,effort:0,fall:0,success:0}}\n}\nfunction snapshot(trial){\n const s=rigSensors(trial.rig);\n return {id:trial.id,kind:trial.rig.kind,status:trial.done?(trial.reason||'EPISODE COMPLETE'):'RUNNING',\n  failed:!!trial.reason,progress:trial.progress,time:trial.elapsed,yaw:trial.yaw,torqueDemand:trial.torqueDemand,\n  torsoHeight:s.y,upright:s.upright,links:trial.rig.links.map(l=>{\n   const p=l.body.translation(),q=l.body.rotation();return [p.x,p.y,p.z,q.x,q.y,q.z,q.w];})};\n}\nfunction stepTrial(e){\n if(e.done)return;\n const dt=1/60,t=e.elapsed,kind=e.rig.kind,s=rigSensors(e.rig),cmd=command(s,e.goal,e.stage);\n const motors=driveRig(e.rig,e.theta,t,cmd);e.effort=motors.effort;\n e.torqueDemand=motors.torqueDemand??0;\n e.world.step();e.elapsed+=dt;e.step++;\n const n=rigSensors(e.rig),nominal=kind==='biped'?1.10:kind==='quadruped'?.68:.47;\n const heightError=(n.y-nominal)/(kind==='biped'?.28:kind==='quadruped'?.20:.17);\n const heightScore=Math.exp(-heightError*heightError);\n const tilt2=n.pitch*n.pitch+n.roll*n.roll,posture=Math.exp(-tilt2/.20);\n const stable=posture*heightScore;\n const upright=n.upright>.79&&n.y>nominal*.74;\n if(upright)e.uprightSeconds+=dt;\n if(stable>.57)e.stableSeconds+=dt;\n e.tiltSum+=tilt2*dt;e.heightSum+=(n.y-nominal)**2*dt;\n e.verticalSum+=n.verticalSpeed**2*dt;\n e.p.alive+=(e.stage===0?2.5:.9)*Math.max(0,n.upright)*dt;\n e.p.height+=(e.stage===0?5.5:1.8)*heightScore*dt;\n e.p.posture+=(e.stage===0?2:1.1)*posture*dt;\n e.p.stability-=dt*(.09*(n.pitchRate**2+n.rollRate**2)+.15*n.verticalSpeed**2);\n if(e.stage===0)e.p.stability-=dt*.5*Math.hypot(n.x-e.initial.x,n.z-e.initial.z);\n const slip=footSlip(e.rig);e.slipSum+=slip*dt;\n e.p.slip-=dt*(kind==='wheeled'?0:.1*slip);\n // This is motor PD demand, not an exposed Rapier solver impulse measurement.\n e.p.effort-=dt*.0015*(motors.torqueDemand??0);\n if(e.prevActions&&motors.actions){\n  let delta=0;for(let k=0;k<motors.actions.length;k++)delta+=(motors.actions[k]-e.prevActions[k])**2;\n  e.actionDelta=delta;e.p.effort-=dt*.05*delta;\n }\n e.prevActions=motors.actions;\n if(e.stage>0){\n  const d=Math.hypot(e.goal.x-n.x,e.goal.z-n.z),delta=limit(e.prevDistance-d,-.08,.08);\n  e.progress+=delta;e.p.progress+=10*delta*limit(.2+.8*stable,0,1);e.prevDistance=d;\n  const targetDirX=(e.goal.x-n.x)/(d||1),targetDirZ=(e.goal.z-n.z)/(d||1);\n  const along=limit((n.x-s.x)/dt*targetDirX+(n.z-s.z)/dt*targetDirZ,-4,4);\n  const desire=Math.min(kind==='wheeled'?.95:.65,Math.max(0,(d-.36)*.8));\n  e.p.tracking+=dt*1.6*Math.exp(-(((along-desire)/.35)**2))*stable;\n  e.p.heading+=dt*.35*Math.exp(-((command(n,e.goal,e.stage).angle/.8)**2))*stable;\n  if(d<.44&&stable>.48){e.reached=true;e.p.success+=16; e.done=true;}\n }\n const unstable=n.y<nominal*.71||n.upright<.72||Math.abs(n.pitch)>.74||Math.abs(n.roll)>.74;\n e.badTime=unstable?e.badTime+dt:0;\n const reason=failureReason(kind,n,e.elapsed,dt,e.badTime);\n if(reason){e.done=true;e.reason=reason;e.p.fall-=10+4*Math.max(0,1-e.elapsed/(e.stage===0?3.4:5.5));failureCount++;resetCount++;}\n const duration=[3.4,5.1,6.2,7.0][e.stage];\n if(e.elapsed>=duration)e.done=true;\n}\nfunction finishTrial(e){\n const s=rigSensors(e.rig),duration=[3.4,5.1,6.2,7.0][e.stage];\n const d=e.stage===0?Math.hypot(s.x-e.initial.x,s.z-e.initial.z):Math.hypot(e.goal.x-s.x,e.goal.z-s.z);\n const reward=Object.values(e.p).reduce((a,b)=>a+b,0);\n const ret={reward:Number.isFinite(reward)?reward:-200,progress:e.progress,distance:d,\n  upright:e.uprightSeconds/duration,stability:e.stableSeconds/duration,\n  tiltRms:Math.sqrt(e.tiltSum/Math.max(e.elapsed,.017)),heightRms:Math.sqrt(e.heightSum/Math.max(e.elapsed,.017)),\n  verticalRms:Math.sqrt(e.verticalSum/Math.max(e.elapsed,.017)),slip:e.slipSum/Math.max(e.elapsed,.017),\n  fallen:!!e.reason,fallReason:e.reason||'',seconds:e.elapsed,reached:e.reached,successRate:e.reached?1:0,\n  fallRate:e.reason?1:0,torqueDemand:e.torqueDemand,actionDelta:e.actionDelta,speed:s.vel,\n  loss:0,parts:e.p};\n e.world.free();episodeCount++;return ret;\n}\nasync function batchEvaluate(kind,jobs,stage,emit=false,parallel=4){\n // Work-conserving pool: each lane owns a separate Rapier World and all links.\n // As soon as any robot fails, score + free its world, then spawn the next\n // candidate in that lane without waiting for other robots to finish.\n const N=Math.min(jobs.length,parallel),slots=Array(N).fill(null),results=Array(jobs.length);\n let queued=0,finished=0,ticks=0;\n const spawn=i=>{\n  if(queued>=jobs.length){slots[i]=null;return;}\n  const k=queued++,job=jobs[k];\n  const t=makeTrial(kind,job.theta,stage,job.scenario,job.yaw,job.friction??1.2,i);\n  t.jobIndex=k;slots[i]=t;\n };\n const emitGhosts=()=>{if(emit)postMessage({op:'ghosts',lanes:slots.map(t=>t?snapshot(t):null),failures:failureCount,resets:resetCount,batchSize:N});};\n for(let i=0;i<N;i++)spawn(i);\n while(finished<jobs.length){\n  for(let i=0;i<N;i++){\n   const t=slots[i];if(!t)continue;\n   if(!t.done)stepTrial(t);\n   if(!t.done)continue;\n   if(t.reason&&emit){\n    // The old world is still alive for the terminal full-body snapshot.\n    postMessage({op:'failure',id:i,reason:t.reason,pose:snapshot(t),resets:resetCount,failures:failureCount});\n   }\n   results[t.jobIndex]=finishTrial(t);finished++;\n   spawn(i); // real full reset, same lane, new independent articulated physics\n  }\n  ticks++;\n  if(ticks%9===0)emitGhosts();\n  if(ticks%24===0)await sleep();\n }\n emitGhosts();\n return results;\n}\n\nasync function parallelEvaluate(kind,jobs,stage,emit=false,lanes=4){\n // Genuine multi-core evaluation, with each child running independent Rapier\n // WASM worlds in its own dedicated worker. Reuse workers across generations.\n if(!evaluatorSource||poolDisabled||typeof Worker!=='function'||workerCount<2)\n  return batchEvaluate(kind,jobs,stage,emit,lanes);\n const n=Math.min(workerCount,lanes,jobs.length);\n if(!workerPool){\n  try{\n   workerPool=[];\n   for(let i=0;i<n;i++){\n    const u=URL.createObjectURL(new Blob([evaluatorSource],{type:'text/javascript'}));\n    const instance=new Worker(u,{type:'module'});URL.revokeObjectURL(u);\n    workerPool.push(instance);\n   }\n   postMessage({op:'pool',mode:'MULTI-CORE WORKERS',workers:workerPool.length,lanes});\n  }catch(error){\n   poolDisabled=true;for(const w of workerPool||[])w.terminate();workerPool=null;\n   postMessage({op:'notice',message:'Parallel worker pool unavailable; single-worker batched fallback: '+String(error)});\n   return batchEvaluate(kind,jobs,stage,emit,lanes);\n  }\n }\n const count=workerPool.length,groups=Array.from({length:count},()=>[]),indices=Array.from({length:count},()=>[]);\n for(let i=0;i<jobs.length;i++){const slot=i%count;groups[slot].push(jobs[i]);indices[slot].push(i);}\n const laneCaps=groups.map((g,i)=>Math.min(Math.floor(lanes/count)+(i<lanes%count?1:0),g.length));\n const laneOffset=i=>laneCaps.slice(0,i).reduce((a,b)=>a+b,0);\n const ghostViews=laneCaps.map(cap=>Array(cap).fill(null));\n function emitCombined(){if(emit)postMessage({op:'ghosts',lanes:ghostViews.flat(),failures:failureCount,resets:resetCount,batchSize:lanes});}\n try{\n  const arrays=await Promise.all(workerPool.map((worker,idx)=>new Promise((resolve,reject)=>{\n   worker.onmessage=event=>{\n    const m=event.data;\n    if(m.op==='ghosts'){\n     ghostViews[idx]=Array.from({length:laneCaps[idx]},(_,i)=>m.lanes[i]||null);\n     emitCombined();\n    }else if(m.op==='failure'){\n     // Lane identifier is made unique across parallel workers.\n     failureCount++;resetCount++;\n     if(emit)postMessage({...m,id:laneOffset(idx)+m.id,failures:failureCount,resets:resetCount});\n    }else if(m.op==='result')resolve(m.results);\n    else if(m.op==='error')reject(Error(m.message));\n   };\n   worker.onerror=error=>reject(Error(error.message||'child worker failed'));\n   worker.postMessage({op:'evaluate',kind,jobs:groups[idx],stage,emit,lanes:laneCaps[idx]});\n  })));\n  const all=Array(jobs.length);\n  for(let w=0;w<count;w++)for(let i=0;i<arrays[w].length;i++)all[indices[w][i]]=arrays[w][i];\n  episodeCount+=all.length;\n  return all;\n }catch(error){\n  poolDisabled=true;for(const w of workerPool||[])w.terminate();workerPool=null;\n  postMessage({op:'notice',message:'Multi-worker evaluation failed, reverting to single worker: '+String(error)});\n  return batchEvaluate(kind,jobs,stage,emit,lanes);\n }\n}\nfunction aggregate(stats){\n const n=stats.length||1,m=k=>stats.reduce((a,s)=>a+(Number(s[k])||0),0)/n;\n const parts=Object.fromEntries(Object.keys(stats[0].parts).map(k=>[k,mPart(k)]));\n function mPart(k){return stats.reduce((a,s)=>a+s.parts[k],0)/n;}\n return {reward:m('reward'),progress:m('progress'),distance:m('distance'),upright:m('upright'),\n  stability:m('stability'),tiltRms:m('tiltRms'),heightRms:m('heightRms'),verticalRms:m('verticalRms'),\n  slip:m('slip'),seconds:m('seconds'),fallen:stats.some(s=>s.fallen),fallRate:m('fallRate'),\n  successRate:m('successRate'),reached:stats.some(s=>s.reached),torqueDemand:m('torqueDemand'),\n  actionDelta:m('actionDelta'),loss:0,speed:m('speed'),parts,fallReasons:stats.map(s=>s.fallReason).filter(Boolean)};\n}\nfunction cpValid(cp,kind){return !!(cp&&[2,3,4].includes(cp.version)&&cp.kind===kind&&Array.isArray(cp.best)&&cp.best.length===12&&cp.best.every(Number.isFinite));}\nfunction nextVector(mean,std,elite){\n const p=Math.random();\n if(p<.16)return [...elite];\n if(p<.23)return seedVector(requestedKind);\n return mean.map((v,i)=>limit(v+normal()*std[i],-1,1));\n}\nfunction promote(stage,s,kind){\n if(stage===0)return s.upright>.85&&s.stability>.64&&s.fallRate===0;\n if(stage===1)return s.upright>.8&&s.progress>(kind==='wheeled'?1.4:.8)&&s.fallRate===0;\n if(stage===2)return s.successRate>.49&&s.fallRate===0;\n return false;\n}\nasync function train(kind,cp,population,lanes){\n if(!RP)await initialize();\n const prior=cpValid(cp,kind)?cp:null,migrated=!!(prior&&prior.version!==4);\n // Stage-0 v3 policies are retained as candidates, but previous fitness is NOT\n // comparable to v4. Preserve history only for provenance, never merge curves.\n let stage=migrated?0:limit(prior?.stage|0,0,3),gen=prior?.generation||0;\n let mean=prior?[...prior.mean]:seedVector(kind),best=prior?[...prior.best]:seedVector(kind);\n let std=prior?.version===4?[...prior.std]:Array(12).fill(.30);\n let bestFitness=prior?.version===4&&Number.isFinite(prior.bestFitness)?prior.bestFitness:-Infinity;\n let history=prior?.version===4?[...(prior.history||[])]:[];\n let cpPrior=prior?.version===4?prior:null;\n episodeCount=prior?.episodes||0;failureCount=prior?.failures||0;resetCount=prior?.resets||0;\n let robust=null,pass=0,stalled=0;\n postMessage({op:'ready',kind,stage,migrated,restored:!!prior,lanes});\n // The same fixed heading set is applied to ALL candidates in a generation.\n // Headings are evaluated separately and compared by their mean fitness.\n while(training&&requestedKind===kind){\n  const cohorts=[];\n  const pop=Math.max(6,Math.min(24,population));\n  for(let i=0;i<pop;i++)cohorts.push({theta:i===0?[...best]:i===1?[...mean]:nextVector(mean,std,best),scores:[]});\n  const yaws=stage===0?[-.62,.62]:stage===1?[-.62,.62]:[-.65,0,.65];\n  const jobs=[];\n  for(let i=0;i<pop;i++)for(let j=0;j<yaws.length;j++)jobs.push({theta:cohorts[i].theta,yaw:yaws[j],scenario:j,owner:i});\n  const allResults=await parallelEvaluate(kind,jobs,stage,true,lanes);\n  for(let i=0;i<jobs.length;i++)cohorts[jobs[i].owner].scores.push(allResults[i]);\n  if(!training||requestedKind!==kind)break;\n  for(const c of cohorts)c.stats=aggregate(c.scores);\n  cohorts.sort((a,b)=>b.stats.reward-a.stats.reward);\n  const avg=cohorts.reduce((a,c)=>a+c.stats.reward,0)/pop;\n  const winner=cohorts[0];\n  if(winner.stats.reward>bestFitness+.015){bestFitness=winner.stats.reward;best=[...winner.theta];stalled=0;}else stalled++;\n  const elites=cohorts.slice(0,Math.max(2,Math.ceil(pop*.35)));\n  mean=mean.map((_,i)=>limit(elites.reduce((a,e)=>a+e.theta[i],0)/elites.length,-1,1));\n  std=std.map((v,i)=>{\n   const variance=elites.reduce((a,e)=>a+(e.theta[i]-mean[i])**2,0)/elites.length;\n   return limit(.78*v+.22*Math.sqrt(variance+.004)+(stalled>14?.012:0),.065,.52);\n  });\n  gen++;\n  // Report winner of the CURRENT population; don't misrepresent the saved\n  // best-ever policy as that candidate's physical metrics.\n  const current=winner.stats;\n  if(promote(stage,current,kind))pass++;else pass=0;\n  if(gen>10&&stalled>10&&current.fallRate>=.99&&current.seconds<.85&&gen%6===0){\n   postMessage({op:'notice',message:`ACTUATION ALERT: ${kind} is collapsing within ${current.seconds.toFixed(2)}s across all headings; check joint anchors, motor saturation, foot geometry and servo limits before further parameter sweeps.`});\n  }\n  if(gen===1||gen%6===0){\n   const r=await batchEvaluate(kind,[{theta:best,yaw:-.35,scenario:0,friction:.68},{theta:best,yaw:.35,scenario:1,friction:1.9}],stage,false);\n   robust={lowGrip:r[0].reward,highGrip:r[1].reward};\n  }\n  let promoted=false;\n  if(pass>=3&&stage<3){stage++;bestFitness=-Infinity;mean=[...best];std=Array(12).fill(.24);pass=0;stalled=0;promoted=true;}\n  const point={generation:gen,stage:promoted?stage-1:stage,best:promoted?current.reward:bestFitness,average:avg,\n   progress:current.progress,upright:current.upright,stability:current.stability,success:current.successRate,\n   fallRate:current.fallRate,tilt:current.tiltRms,height:current.heightRms,torque:current.torqueDemand,\n   resets:resetCount,loss:current.loss,episode:episodeCount,robust:robust?Math.min(robust.lowGrip,robust.highGrip):null};\n  history.push(point);if(history.length>650)history.shift();\n  const result={version:4,kind,algorithm:'CEM / two-orientation matched parallel Rapier physics batch / torso failure resets',\n   stage,stageName:STAGE_NAMES[stage],generation:gen,episodes:episodeCount,failures:failureCount,resets:resetCount,\n   lanes,mean,std,best,bestFitness:Number.isFinite(bestFitness)?bestFitness:null,history,\n   robust,last:current,updated:new Date().toISOString(),migratedFrom:prior?.version||null};\n  postMessage({op:'generation',kind,checkpoint:result,point,promoted});\n  await sleep();\n }\n postMessage({op:'stopped',kind,episodes:episodeCount,failures:failureCount,resets:resetCount});\n}\nonmessage=async e=>{\n const m=e.data;if(m.op==='stop'){training=false;for(const w of workerPool||[])w.terminate();workerPool=null;return;}\n if(m.op==='evaluate'){\n  try{if(!RP)await initialize();const results=await batchEvaluate(m.kind,m.jobs,m.stage,m.emit,m.lanes);postMessage({op:'result',results});}\n  catch(error){postMessage({op:'error',message:error?.stack||String(error)});}\n  return;\n }\n if(m.op==='start'){\n  training=false;requestedKind=m.kind;evaluatorSource=m.source||null;workerCount=Math.max(1,Math.min(4,Number(m.workers)||2));await sleep();training=true;\n  try{await train(m.kind,m.checkpoint,m.population,limit(Number(m.lanes)||4,2,8));}\n  catch(err){training=false;postMessage({op:'error',kind:m.kind,message:err?.stack||String(err)});}\n }\n};\n";
+// In-browser evolution and self-supervised predictive-state learning. No server.
+let currentKind='wheeled',rig=null,rigVisuals=[],controllerTheta=seedVector('wheeled'),trainer=null,training=false,checkpoints={},dbPromise=null;
+const CHECKPOINT_DB='floorplan-robot-lab-v2'; // existing DB; versioned policy payloads
+function openTrainingDB(){
+ if(dbPromise)return dbPromise;
+ dbPromise=new Promise(resolve=>{
+  if(!('indexedDB' in window)){resolve(null);return;}
+  try{const req=indexedDB.open(CHECKPOINT_DB,1);
+   req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('policies'))req.result.createObjectStore('policies');};
+   req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve(null);
+  }catch(e){resolve(null);}
+ });return dbPromise;
+}
+async function getCheckpoint(kind){
+ try{const db=await openTrainingDB();if(db){return await new Promise(resolve=>{let tx=db.transaction('policies','readonly'),q=tx.objectStore('policies').get(kind);q.onsuccess=()=>resolve(q.result||null);q.onerror=()=>resolve(null);});}}
+ catch(e){log('Checkpoint storage read: '+e.message);}
+ try{return JSON.parse(localStorage.getItem('floorplan-policy-v2-'+kind)||'null');}catch(e){return null;}
+}
+async function saveCheckpoint(cp){
+ checkpoints[cp.kind]=cp;
+ try{const db=await openTrainingDB();if(db){await new Promise((resolve,reject)=>{let tx=db.transaction('policies','readwrite');tx.objectStore('policies').put(cp,cp.kind);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});return;}}
+ catch(e){log('IndexedDB unavailable: '+e.message);}
+ try{localStorage.setItem('floorplan-policy-v2-'+cp.kind,JSON.stringify(cp));}catch(e){log('Checkpoint storage unavailable: '+e.message);}
+}
+async function deleteCheckpoint(kind){
+ const db=await openTrainingDB();if(db)await new Promise(resolve=>{const tx=db.transaction('policies','readwrite');tx.objectStore('policies').delete(kind);tx.oncomplete=resolve;tx.onerror=resolve;});
+ try{localStorage.removeItem('floorplan-policy-v2-'+kind);}catch(e){}
+ delete checkpoints[kind];
+}
+function validPolicy(cp,kind){return !!(cp&&[2,3,4].includes(cp.version)&&cp.kind===kind&&Array.isArray(cp.best)&&cp.best.length===12&&cp.best.every(v=>Number.isFinite(v)&&Math.abs(v)<=1.001));}
+async function restoreController(kind){
+ const cp=await getCheckpoint(kind);if(kind!==currentKind)return;
+ checkpoints[kind]=validPolicy(cp,kind)?cp:null;
+ controllerTheta=checkpoints[kind]?[...cp.best]:seedVector(kind);
+ updateLearningDashboard();drawLearningGraph();
+ if(checkpoints[kind])log(`Restored ${kind} policy · ${cp.generation} generations / ${cp.episodes} physics episodes`);
+ else log(`Fresh ${kind} policy · no prior checkpoint`);
+}
+function downloadJSON(data,name){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+function updateLearningDashboard(){
+ const cp=checkpoints[currentKind],last=cp?.last;
+ $('trainGeneration').textContent=cp?.generation||0;
+ $('trainEpisodes').textContent=cp?.episodes||0;
+ $('trainBest').textContent=Number.isFinite(cp?.bestFitness)?cp.bestFitness.toFixed(1):'—';
+ $('trainStage').textContent=cp?.stageName||['BALANCE','FORWARD','TARGET','ROBUST'][cp?.stage||0];
+ $('trainUpright').textContent=last?`${Math.round(last.upright*100)}% / ${Math.round((last.stability||0)*100)}%`:'—';
+ $('trainProgress').textContent=last?`${(last.progress??last.forward??0).toFixed(2)}m / ${Math.round((last.successRate||0)*100)}%`:'—';
+ $('trainTilt').textContent=last?`${(last.tiltRms||0).toFixed(2)} rad / ${Math.round((last.fallRate||0)*100)}%`:'—';
+ $('trainPrediction').textContent=cp?.history?.length?cp.history.at(-1).loss.toFixed(3):'—';
+ $('checkpointInfo').textContent=cp?`Saved ${cp.updated?.replace('T',' ').slice(0,16)} · ${cp.kind} · v${cp.version}`:'No checkpoint yet — train to create one';
+ $('checkpointDownloadBtn').disabled=!cp;$('checkpointClearBtn').disabled=!cp;
+ $('learningBackend').textContent=`Rapier WASM · multi-worker pool / independent worlds · ${navigator.gpu?'WebGPU available (not used by physics)':'CPU physics'}`;
+ $('trainRobust').textContent=cp?.robust?.lowGrip!==undefined?Math.min(cp.robust.lowGrip,cp.robust.highGrip).toFixed(1):'—';
+ $('resetCount').textContent=`${cp?.resets||0} / ${cp?.failures||0}`;
+ $('heightError').textContent=Number.isFinite(last?.heightRms)?last.heightRms.toFixed(3)+' m':'—';
+ $('trainLife').textContent=Number.isFinite(last?.seconds)?last.seconds.toFixed(2)+' s':'—';
+ $('torqueDemand').textContent=Number.isFinite(last?.torqueDemand)?last.torqueDemand.toFixed(2)+' (proxy)':'—';
+ $('torqueBar').style.width=Number.isFinite(last?.torqueDemand)?Math.min(100,last.torqueDemand/110*100)+'%':'0%';
+ const part=last?.parts;
+ $('rewardBreakdown').innerHTML=part?Object.entries(part).map(([key,value])=>
+   `<div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #203039"><span>${escapeHTML(key)}</span><b style="color:${value>=0?'#7de0c9':'#efb68b'}">${value>=0?'+':''}${value.toFixed(2)}</b></div>`).join(''):
+   '<span class="muted">Waiting for physics trial …</span>';
+}
+function drawLearningGraph(){
+ const canvas=$('learningChart'),ctx=canvas.getContext('2d');if(!ctx)return;
+ const W=canvas.width,H=canvas.height,cp=checkpoints[currentKind],samples=cp?.history||[];
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#08151c';ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle='#243742';ctx.lineWidth=1;for(let y=20;y<H-9;y+=24){ctx.beginPath();ctx.moveTo(30,y);ctx.lineTo(W-8,y);ctx.stroke();}
+ ctx.font='10px ui-monospace,monospace';ctx.fillStyle='#748b94';
+ if(samples.length===0){ctx.fillText('Waiting for real physics trial results',40,H/2);return;}
+ const points=samples.slice(-180),all=points.flatMap(p=>[p.best,p.average]).filter(Number.isFinite),lo=Math.min(...all)-1,hi=Math.max(...all)+1,span=Math.max(1,hi-lo);
+ function plot(field,color){ctx.strokeStyle=color;ctx.lineWidth=1.6;ctx.beginPath();points.forEach((p,i)=>{const x=31+i/Math.max(1,points.length-1)*(W-44),y=H-16-(p[field]-lo)/span*(H-32);if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.stroke();}
+ plot('average','#e6a968');plot('best','#79f0de');
+ for(let i=1;i<points.length;i++)if(points[i].stage!==points[i-1].stage){
+   const x=31+i/Math.max(1,points.length-1)*(W-44);
+   ctx.strokeStyle='#527e86';ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(x,22);ctx.lineTo(x,H-13);ctx.stroke();ctx.setLineDash([]);
+   ctx.fillStyle='#79f0de';ctx.fillText(['B','F','T','R'][points[i].stage]||'?',x+2,29);
+ }
+ if(points.some(p=>Number.isFinite(p.robust))){const filtered=points.filter(p=>Number.isFinite(p.robust));if(filtered.length>1){ctx.strokeStyle='#8b9cff';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();filtered.forEach((p,i)=>{const x=31+points.indexOf(p)/Math.max(1,points.length-1)*(W-44),y=H-16-(p.robust-lo)/span*(H-32);if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.stroke();ctx.setLineDash([]);}}
+ ctx.fillStyle='#8fa8b3';ctx.fillText(hi.toFixed(1),3,16);ctx.fillText(lo.toFixed(1),3,H-16);
+ ctx.fillStyle='#8b9cff';ctx.fillText('SHIFT',W-147,16);ctx.fillStyle='#79f0de';ctx.fillText('BEST',W-100,16);ctx.fillStyle='#e6a968';ctx.fillText('MEAN',W-53,16);
+}
+const ghostGroups=[];
+let ghostLastStatus=[],ghostUpdates=0,liveFailures=0,liveRecoveryCooldown=0;
+const ghostFlashUntil=Array(8).fill(0);
+const ghostGeomCache=new Map();
+function clearGhosts(){for(const g of ghostGroups){scene.remove(g.root);for(const child of g.root.children){child.geometry?.dispose();if(child.material!==g.mat)child.material?.dispose();}g.mat.dispose();}ghostGroups.length=0;ghostLastStatus=[];$('ghostHud').textContent='GHOST PHYSICS ENVS · IDLE';}
+function addGhostLane(kind,id){
+ const lane=new THREE.Group();lane.name='training environment '+id;scene.add(lane);
+ const gmat=new THREE.MeshBasicMaterial({color:0x70dbef,transparent:true,opacity:.31,depthWrite:false});
+ const robotShapes=kind==='wheeled'?[['chassis',[.78,.24,1.06]],['wheel', [.19,.60,.60]],['wheel',[.19,.60,.60]]]:
+  kind==='quadruped'?[['torso',[.72,.22,.92]],...Array.from({length:4},()=>[['yoke',[.12,.10,.13]],['thigh',[.13,.32,.14]],['shin',[.11,.29,.12]]]).flat()]:
+  [['torso',[.49,.54,.30]],...Array.from({length:2},()=>[['hipYaw',[.105,.08,.12]],['hipRoll',[.105,.08,.12]],['thigh',[.16,.40,.18]],['shank',[.14,.39,.16]],['ankle',[.12,.09,.13]],['foot',[.18,.105,.31]]]).flat()];
+ const meshes=[];
+ for(let i=0;i<robotShapes.length;i++){
+  const [name,size]=robotShapes[i],geom=new THREE.BoxGeometry(...size);
+  const mesh=new THREE.Mesh(geom,gmat);mesh.castShadow=false;mesh.receiveShadow=false;lane.add(mesh);meshes.push(mesh);
+ }
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(2.1,2.7),new THREE.MeshBasicMaterial({color:0x183e46,transparent:true,opacity:.22,side:THREE.DoubleSide,depthWrite:false}));
+ ground.rotation.x=-Math.PI/2;ground.position.y=.018;lane.add(ground);
+ ghostGroups[id]={root:lane,meshes,mat:gmat};
+}
+function receiveGhosts(m){
+ if(!$('showGhosts').checked)return;
+ ghostUpdates++;
+ if(ghostGroups.length!==m.lanes.length){clearGhosts();for(let i=0;i<m.lanes.length;i++)addGhostLane(currentKind,i);}
+ let failed=0;
+ for(let i=0;i<m.lanes.length;i++){
+  const snap=m.lanes[i],entry=ghostGroups[i];if(!entry||!snap)continue;
+  const columns=Math.min(4,m.lanes.length),col=i%columns,row=Math.floor(i/columns);
+  const baseX=-5.1+col*2.65,baseZ=-3.8+row*3.0;
+  entry.root.position.set(baseX,0,baseZ);
+  const bad=snap.failed,complete=snap.status!=='RUNNING';
+  entry.mat.color.setHex(bad||performance.now()<ghostFlashUntil[i]?0xff816c:complete?0xadb4bc:0x7aeed5);
+  entry.mat.opacity=bad?.48:.29;failed+=bad?1:0;
+  for(let k=0;k<entry.meshes.length;k++){
+   const d=snap.links[k],mesh=entry.meshes[k];if(!d){mesh.visible=false;continue;}mesh.visible=true;
+   mesh.position.set(d[0],d[1],d[2]);mesh.quaternion.set(d[3],d[4],d[5],d[6]);
+  }
+  if(bad&&ghostLastStatus[i]!==snap.status)log(`GHOST ${i+1} reset: ${snap.status}`);
+  ghostLastStatus[i]=snap.status;
+ }
+ $('ghostHud').textContent=`${m.lanes.length} LIVE RAPIER ENVS · ${failed} FAILED · ${m.resets} RESETS\n`+
+  m.lanes.map((g,i)=>g?`#${i+1} ${g.status==='RUNNING'?'RUN':g.failed?'FALL':'DONE'}  y=${g.torsoHeight.toFixed(2)}m  PD=${g.torqueDemand.toFixed(1)}`:`#${i+1}  IDLE / RESET`).join('\n');
+ $('ghostHud').style.whiteSpace='pre';
+ $('resetCount').textContent=`${m.resets} / ${m.failures}`;
+ const avgPD=m.lanes.reduce((a,g)=>a+(g?.torqueDemand||0),0)/Math.max(1,m.lanes.length);
+ $('torqueDemand').textContent=avgPD.toFixed(2)+' (proxy)';
+ $('torqueBar').style.width=Math.min(100,avgPD/110*100)+'%';
+}
+function liveFailure(){
+ if(!rig||!world||paused)return;
+ const s=rigSensors(rig),nominal=currentKind==='biped'?1.1:currentKind==='quadruped'?.68:.47;
+ const collapsed=s.y<(currentKind==='biped'?.55:currentKind==='quadruped'?.34:.24);
+ const lowered=s.y<nominal*.69;
+ const unstable=s.upright<.50||Math.abs(s.pitch)>1.1||Math.abs(s.roll)>1.1;
+ if(collapsed||lowered||unstable)liveRecoveryCooldown+=1/60;else liveRecoveryCooldown=0;
+ if((collapsed&&liveRecoveryCooldown>1/60)||liveRecoveryCooldown>.15){
+  liveFailures++;const msg=collapsed?'CATASTROPHIC COLLAPSE':lowered?'TORSO HEIGHT LOSS':'TORSO DESTABILIZED';
+  const toast=$('failureToast');toast.textContent=`${msg} — RESET #${liveFailures}`;toast.style.display='block';
+  clearTimeout(liveFailure._timer);liveFailure._timer=setTimeout(()=>toast.style.display='none',1400);
+  const old=rig.start||{x:0,z:4.4,yaw:Math.PI};
+  destroyRobotRig();makeRobot(old.x,old.z,old.yaw);selectEntity(robot);
+  liveRecoveryCooldown=0;needReplan=true;lastPos=null;
+  log(`MAIN ROBOT RESET #${liveFailures}: ${msg} (weights preserved)`);
+ }
+}
+function stopTraining(){clearGhosts();if(trainer){trainer.postMessage({op:'stop'});trainer.terminate();trainer=null;}training=false;$('trainBtn').textContent='▶ TRAIN GAIT';$('trainBtn').classList.remove('active');$('trainState').textContent='HALTED';}
+async function startTraining(){
+ if(training){stopTraining();return;}
+ if(!world){warn('WASM physics must initialize before training');return;}
+ training=true;$('trainBtn').textContent='■ STOP TRAINING';$('trainBtn').classList.add('active');$('trainState').textContent='BOOTING WORKER';
+ const kind=currentKind;
+ const functions=[THREE_SAFE_VECTOR,buildRig,rigSensors,seedVector,estimateMotorDemand,driveRig].map(fn=>fn.toString()).join('\n');
+ const workerText=functions+'\n'+TRAINER_BODY;
+ const url=URL.createObjectURL(new Blob([workerText],{type:'text/javascript'}));
+ try{trainer=new Worker(url,{type:'module'});}catch(e){URL.revokeObjectURL(url);stopTraining();warn('Worker creation failed: '+e.message);return;}
+ URL.revokeObjectURL(url);
+ trainer.onerror=e=>{stopTraining();warn('Training worker: '+(e.message||'CDN or worker error'));};
+ trainer.onmessage=async e=>{
+  const m=e.data;if(kind!==currentKind)return;
+  if(m.op==='ghosts'){receiveGhosts(m);return;}
+  if(m.op==='pool'){log(`Parallel training: ${m.workers} CPU workers, ${m.lanes} physics environments`);$('policySource').textContent=`${m.workers} WORKERS / ${m.lanes} ENVS`;return;}
+  if(m.op==='notice'){log(m.message);return;}
+  if(m.op==='failure'){
+    ghostFlashUntil[m.id]=performance.now()+650;
+    log(`ENV ${m.id+1} FAILED — ${m.reason}. FULL RIG RESET #${m.resets}`);
+    $('ghostHud').style.borderColor='#e77670';
+    setTimeout(()=>$('ghostHud').style.borderColor='#385b5b',400);
+    $('resetCount').textContent=`${m.resets} / ${m.failures}`;
+    return;
+  }
+  if(m.op==='ready'){$('trainState').textContent='EVOLVING · '+(['BALANCE','FORWARD','TARGET','ROBUST'][m.stage]||'PHYSICS');
+    log(`Training ${kind}: ${m.lanes} independent Rapier environments, v4; ${m.migrated?'v3 policy migrated':'ready'}`);}
+  else if(m.op==='generation'){
+   if(!validPolicy(m.checkpoint,kind)){warn('Invalid training checkpoint rejected');return;}
+   checkpoints[kind]=m.checkpoint;
+   controllerTheta=[...m.checkpoint.best];
+   $('trainState').textContent='EVOLVING · '+m.checkpoint.stageName;
+   if(m.promoted)log(`Curriculum promoted → ${m.checkpoint.stageName}`);
+   updateLearningDashboard();drawLearningGraph();
+   // Atomic IndexedDB save of full checkpoint (weights + optimizer state + traces).
+   await saveCheckpoint(m.checkpoint);
+   if(m.checkpoint.generation%5===0)log(`${kind}: gen ${m.checkpoint.generation} / reward ${m.checkpoint.bestFitness.toFixed(1)} / ${m.checkpoint.episodes} episodes`);
+  }else if(m.op==='error'){stopTraining();warn('Trial trainer failure: '+m.message);}
+  else if(m.op==='stopped'){stopTraining();log('Training stopped; checkpoint retained');}
+ };
+ trainer.postMessage({op:'start',kind,checkpoint:checkpoints[kind]||null,population:Number($('population').value),lanes:Number($('lanes').value),workers:Number($('workers').value),source:workerText});
+}
+function stopAndSwitch(kind){
+ if(!['wheeled','quadruped','biped'].includes(kind))return;
+ stopTraining();currentKind=kind;
+ if(world){
+  destroyRobotRig();makeRobot(0,4.4,Math.PI);selectEntity(robot);needReplan=true;
+ }
+ $('robotType').value=kind;
+ $('robotState').textContent=`${kind.toUpperCase()} / articulated Rapier rigid bodies & powered joints`;
+ $('robotArchitecture').textContent=`${kind.toUpperCase()} · ${rig?.links.length||0} rigid links · ${rig?.motors.length||0} powered revolute joints · full 3D contacts`;
+ restoreController(kind);
+}
+$('robotType').addEventListener('change',e=>stopAndSwitch(e.target.value));
+$('trainBtn').onclick=startTraining;
+$('checkpointDownloadBtn').onclick=()=>{const cp=checkpoints[currentKind];if(cp)downloadJSON(cp,`robot-${currentKind}-rewards-v${cp.version}-gen${cp.generation}.json`);};
+$('checkpointUploadBtn').onclick=()=>$('checkpointFile').click();
+$('checkpointFile').onchange=async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{if(file.size>2e6)throw Error('Checkpoint too large');const cp=JSON.parse(await file.text());
+   if(!validPolicy(cp,currentKind)||!Array.isArray(cp.mean)||cp.mean.length!==12||!Array.isArray(cp.std)||cp.std.length!==12)throw Error('Wrong robot type or incompatible policy schema');
+   await saveCheckpoint(cp);controllerTheta=[...cp.best];updateLearningDashboard();drawLearningGraph();log(`Imported ${currentKind} checkpoint generation ${cp.generation}`);
+ }catch(err){warn('Checkpoint import rejected: '+err.message);}finally{$('checkpointFile').value='';}
+};
+$('checkpointClearBtn').onclick=async()=>{stopTraining();await deleteCheckpoint(currentKind);controllerTheta=seedVector(currentKind);updateLearningDashboard();drawLearningGraph();log('Cleared training history for '+currentKind);};
+
+function drawEntities(){let html=`<button class="entity ${selected?.type==='robot'?'selected':''}" data-id="0"><span class="epip"></span>${robot?.name||"ROBOT"} <small>dynamic</small></button>`;
+ for(const e of objects)html+=`<button class="entity ${selected?.id===e.id?'selected':''}" data-id="${e.id}"><span class="epip ${e.dynamic?'dynamic':''}"></span>${escapeHTML(e.name)} <small>${e.dynamic?'dynamic':'static'}</small></button>`;
+ $('entities').innerHTML=html;$('entityCount').textContent=String(objects.length+1);
+ for(const b of $('entities').querySelectorAll('button'))b.onclick=()=>selectEntity(Number(b.dataset.id)===0?robot:objects.find(e=>e.id===Number(b.dataset.id)));
+}
+function selectEntity(e){if(!e)return;selected=e;transform.detach();if(e!==robot)transform.attach(e.mesh);drawEntities();refreshInspector();}
+function refreshInspector(){if(!selected)return;const e=selected,g=e.mesh;$('selectedName').textContent=e.name;$('selectedType').textContent=e.dynamic?'DYNAMIC':'FIXED';$('posX').value=g.position.x.toFixed(2);$('posZ').value=g.position.z.toFixed(2);$('rotation').value=Math.round(THREE.MathUtils.radToDeg(g.rotation.y));$('rotationOut').textContent=$('rotation').value+'°';$('deleteBtn').disabled=e===robot;$('duplicateBtn').disabled=e===robot;}
+function deleteEntity(e){if(!e||e===robot)return;transform.detach();scene.remove(e.mesh);world.removeRigidBody(e.body);const i=objects.indexOf(e);if(i>=0)objects.splice(i,1);selected=null;selectEntity(robot);needReplan=true;log('Removed '+e.name);}
+function moveEntity(e,x,z,yaw){
+ if(!e)return;if(![x,z,yaw].every(Number.isFinite))return;x=clamp(x,-8,8);z=clamp(z,-6,6);
+ if(e===robot){destroyRobotRig();makeRobot(x,z,yaw);selected=robot;drawEntities();needReplan=true;refreshInspector();return;}
+ const y=e.mesh.position.y,q={x:0,y:Math.sin(yaw/2),z:0,w:Math.cos(yaw/2)};
+ e.mesh.position.set(x,y,z);e.mesh.quaternion.set(q.x,q.y,q.z,q.w);
+ e.body.setTranslation({x,y,z},true);e.body.setRotation(q,true);needReplan=true;refreshInspector();
+}
+function makeWorld(){world=new RAPIER.World({x:0,y:-9.81,z:0});world.timestep=1/60;
+ world.createCollider(RAPIER.ColliderDesc.cuboid(9,.2,7).setTranslation(0,-.21,0).setFriction(1.8));
+ for(const [sx,sz,x,z] of [[18,.22,0,-6.98],[18,.22,0,6.98],[.22,14,-8.98,0],[.22,14,8.98,0]])world.createCollider(RAPIER.ColliderDesc.cuboid(sx/2,.4,sz/2).setTranslation(x,.4,z));
+ createEntity('rack',-6,-3.8,.02);createEntity('rack',-6,2.2,0);createEntity('rack',5.9,-4.2,Math.PI/2);
+ createEntity('machine',2,-2.6,.03);createEntity('machine',5.5,1.7,0);createEntity('conveyor',-.8,1.3,.06);
+ createEntity('pallet',-2.7,-2.8,0);createEntity('bollard',2.8,3.0,0);createEntity('bollard',3.6,3.0,0);
+ createEntity('crate',-3.5,3.9,.15);createEntity('crate',3.7,4.6,-.1);
+ makeRobot();selectEntity(robot);goalMarker.position.set(goal.x,0,goal.z);drawEntities();log('Rapier world: gravity, articulated motors, real contact');
+}
+    // Offscreen HDR color plus the ACTUAL camera depth buffer.
+    const hdrSupported=renderer.extensions.has('EXT_color_buffer_float');
+    const rtType=hdrSupported?THREE.HalfFloatType:THREE.UnsignedByteType;
+    const frameRT=new THREE.WebGLRenderTarget(1,1,{type:rtType,format:THREE.RGBAFormat,depthBuffer:true,stencilBuffer:false,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
+    frameRT.depthTexture=new THREE.DepthTexture(1,1,THREE.UnsignedIntType);
+    frameRT.depthTexture.format=THREE.DepthFormat;
+    frameRT.depthTexture.minFilter=THREE.NearestFilter;
+    frameRT.depthTexture.magFilter=THREE.NearestFilter;
+    // A defocused surface is an area integral, not a handful of translated images.
+    // Layer separation prevents near objects from being repeatedly sampled into far blur.
+    // The half-resolution layers are mipmapped: wide aperture samples integrate source
+    // pixels using an explicit footprint, removing the multiple-outline/ghosting effect.
+    const layerOptions={type:rtType,format:THREE.RGBAFormat,depthBuffer:false,stencilBuffer:false,
+      minFilter:THREE.LinearMipmapLinearFilter,magFilter:THREE.LinearFilter,generateMipmaps:true};
+    const nearLayerRT=new THREE.WebGLRenderTarget(1,1,layerOptions);
+    const farLayerRT=new THREE.WebGLRenderTarget(1,1,layerOptions);
+    const blurOptions={type:rtType,format:THREE.RGBAFormat,depthBuffer:false,stencilBuffer:false,
+      minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter};
+    const nearBlurRT=new THREE.WebGLRenderTarget(1,1,blurOptions);
+    const farBlurRT=new THREE.WebGLRenderTarget(1,1,blurOptions);
+    const dofRT=new THREE.WebGLRenderTarget(1,1,blurOptions);
+    const ppScene=new THREE.Scene();
+    const ppCamera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+    const quad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.MeshBasicMaterial());ppScene.add(quad);
+
+    const passVertex=`
+      varying vec2 vUv;
+      void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}
+    `;
+    // The thin-lens CoC is signed: positive = behind focus, negative = in front.
+    // It measures RADIUS in pixels. Lenses create disks (circle-of-confusion), not
+    // shifted copies of the source image.
+    const opticsGLSL=`
+      uniform sampler2D tDepth;
+      uniform vec2 uResolution;
+      uniform float uNear,uFar,uFocal,uFstop,uFocus,uSensorWidth,uMaxBlur;
+      float linearZ(float d){return (uNear*uFar)/max(uFar-d*(uFar-uNear),.00001);}
+      float cocRadius(float z){
+        float f=uFocal,s=uFocus*1000.,zmm=max(z*1000.,1.);
+        float mm=(f*f*(zmm-s))/(uFstop*zmm*max(s-f,.01));
+        return clamp(mm*.5*(uResolution.x/uSensorWidth),-uMaxBlur,uMaxBlur);
+      }
+    `;
+    const sharedOptics={
+      tDepth:{value:frameRT.depthTexture},uResolution:{value:new THREE.Vector2(1,1)},
+      uNear:{value:camera.near},uFar:{value:camera.far},uFocal:{value:S.focal},
+      uFstop:{value:S.aperture},uFocus:{value:S.focus},
+      uSensorWidth:{value:sensorWidthMM},uMaxBlur:{value:S.maxBlur}
+    };
+    const layerUniforms={...sharedOptics,tColor:{value:frameRT.texture},uLayer:{value:0}};
+    const layerMaterial=new THREE.ShaderMaterial({uniforms:layerUniforms,vertexShader:passVertex,
+      fragmentShader:`
+        precision highp float;
+        uniform sampler2D tColor;
+        uniform int uLayer;
+        varying vec2 vUv;
+        ${opticsGLSL}
+        void main(){
+          // 3x3 area prefilter before blur. Premultiplied RGB and coverage are
+          // essential for a correct transparent foreground silhouette.
+          vec3 rgb=vec3(0.);float cov=0.;
+          vec2 px=1./uResolution;
+          for(int y=-1;y<=1;y++) for(int x=-1;x<=1;x++){
+            vec2 uv=clamp(vUv+vec2(float(x),float(y))*px*.65,px*.5,1.-px*.5);
+            float c=cocRadius(linearZ(texture2D(tDepth,uv).r));
+            float nearMask=smoothstep(.75,2.0,-c);
+            float a=(uLayer==1)?nearMask:(1.-nearMask);
+            float w=(x==0 && y==0)?2.:1.;
+            rgb+=texture2D(tColor,uv).rgb*a*w;
+            cov+=a*w;
+          }
+          gl_FragColor=vec4(rgb/10.,cov/10.);
+        }
+      `,depthTest:false,depthWrite:false,toneMapped:false});
+
+    // WebGL2 explicit-mip filtered stochastic quadrature.
+    // Prefilter mip LOD matches approximately the inter-sample spacing on a disk.
+    // Without this, a few dozen discrete taps reproduce objects multiple times.
+    const passVertex3=`
+      out vec2 vUv;
+      void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}
+    `;
+    const opticsGLSL3=opticsGLSL.replaceAll('texture2D(', 'texture(');
+    const diskUniforms={
+      ...sharedOptics,
+      uHalfResolution:{value:new THREE.Vector2(1,1)},
+      uSamples:{value:S.samples},uLayerTexture:{value:farLayerRT.texture},
+      uIsNear:{value:0}
+    };
+    const diskMaterial=new THREE.ShaderMaterial({
+      glslVersion:THREE.GLSL3,uniforms:diskUniforms,vertexShader:passVertex3,
+      fragmentShader:`
+        precision highp float;
+        uniform sampler2D uLayerTexture;
+        uniform vec2 uHalfResolution;
+        uniform int uSamples,uIsNear;
+        in vec2 vUv;
+        out vec4 fragColor;
+        ${opticsGLSL3}
+        const float GOLDEN_ANGLE=2.399963229728653;
+        const float TWO_PI=6.283185307179586;
+        float getCoC(vec2 p){return cocRadius(linearZ(texture(tDepth,clamp(p,vec2(0.),vec2(1.))).r));}
+        void main(){
+          vec2 halfTexel=1./uHalfResolution;
+          float c0=getCoC(vUv);
+          float radius=0.;
+          float z0=linearZ(texture(tDepth,vUv).r);
+          if(uIsNear==0){
+            radius=max(c0,0.)*.5;
+            if(radius<.5){fragColor=vec4(0.);return;}
+          }else{
+            // The foreground must scatter OUTSIDE its original silhouette.
+            // Max-filter an approximate foreground CoC neighborhood, rather
+            // than letting the sharp pixel's depth dictate the gather radius.
+            radius=max(-c0*.5,0.);
+            float search=uMaxBlur*.5;
+            for(int i=0;i<32;i++){
+              float a=float(i%8)*TWO_PI/8.;
+              float ring=float(i/8);
+              float r=search*(.125+ring*.25);
+              vec2 delta=vec2(cos(a),sin(a))*r*halfTexel;
+              float nc=getCoC(vUv+delta);
+              // Only consider a source if the output is within its blur disk.
+              float nr=max(-nc*.5,0.);
+              if(nr>=r-.75)radius=max(radius,nr);
+            }
+            // A mild 1 px extension prevents visible under-coverage at edges.
+            if(radius<.45){fragColor=vec4(0.);return;}
+          }
+          radius=min(radius,uMaxBlur*.5);
+          float spacing=radius*sqrt(3.14159265/float(uSamples));
+          float lod=clamp(log2(max(1.,spacing*1.65)),0.,5.);
+          vec3 accumulated=vec3(0.);
+          float alphaSum=0.;
+          float weightSum=0.;
+          // Rotating the quasi-uniform disk per-pixel converts fixed patterns
+          // to low-amplitude texture rather than a ring of duplicated contours.
+          float rotation=fract(sin(dot(floor(gl_FragCoord.xy),vec2(12.9898,78.233)))*43758.5453)*TWO_PI;
+          for(int i=0;i<64;i++){
+            if(i>=uSamples)break;
+            float q=(float(i)+.5)/float(uSamples);
+            float a=float(i)*GOLDEN_ANGLE+rotation;
+            vec2 delta=sqrt(q)*radius*vec2(cos(a),sin(a));
+            vec2 uv=clamp(vUv+delta*halfTexel,halfTexel*.5,1.-halfTexel*.5);
+            vec4 sampleColor=textureLod(uLayerTexture,uv,lod);
+            float c=getCoC(uv);
+            float weight=1.;
+            if(uIsNear==1){
+              // Spatially varying aperture footprint. Solid foreground should
+              // integrate to opacity 1; just its outline is feathered.
+              float sourceRadius=max(-c*.5,0.);
+              weight=1.-smoothstep(sourceRadius-.6,sourceRadius+.6,length(delta));
+              weight*=smoothstep(.6,1.8,-c);
+              accumulated+=sampleColor.rgb*weight;
+              alphaSum+=sampleColor.a*weight;
+            }else{
+              // Reject foreground occluders and nearer depth discontinuities;
+              // preserve same-depth surface continuity in the far layer.
+              float sz=linearZ(texture(tDepth,uv).r);
+              weight=clamp(1.+(sz-z0)/max(z0*.08,.1),0.,1.);
+              accumulated+=sampleColor.rgb*weight;
+              alphaSum+=sampleColor.a*weight;
+              weightSum+=weight;
+            }
+          }
+          if(uIsNear==1){
+            float inv=1./float(uSamples);
+            fragColor=vec4(accumulated*inv,clamp(alphaSum*inv,0.,1.));
+          }else{
+            // Normalize by valid source coverage to avoid foreground dark rims.
+            fragColor=vec4(accumulated/max(alphaSum,.0001),clamp(alphaSum/max(weightSum,.0001),0.,1.));
+          }
+        }
+      `,
+      depthTest:false,depthWrite:false,toneMapped:false
+    });
+
+    const compositeUniforms={...sharedOptics,
+      tColor:{value:frameRT.texture},tFarBlur:{value:farBlurRT.texture},
+      tNearBlur:{value:nearBlurRT.texture},uEnabled:{value:1},uDebug:{value:0}};
+    const compositeMaterial=new THREE.ShaderMaterial({uniforms:compositeUniforms,vertexShader:passVertex,
+      fragmentShader:`
+        precision highp float;
+        uniform sampler2D tColor,tFarBlur,tNearBlur;
+        uniform int uEnabled,uDebug;
+        varying vec2 vUv;
+        ${opticsGLSL}
+        void main(){
+          float z=linearZ(texture2D(tDepth,vUv).r);
+          float c=cocRadius(z);
+          if(uDebug==1){
+            gl_FragColor=vec4(vec3(1.-log2(1.+z)/log2(1.+uFar)),1.);return;
+          }
+          if(uDebug==2){
+            float strength=clamp(abs(c)/max(uMaxBlur,.001),0.,1.);
+            vec3 tint=c<0.?vec3(.96,.34,.18):vec3(.16,.69,.95);
+            gl_FragColor=vec4(mix(vec3(.04,.055,.065),tint,strength),1.);return;
+          }
+          vec3 sharp=texture2D(tColor,vUv).rgb;
+          if(uEnabled==0){gl_FragColor=vec4(sharp,1.);return;}
+          vec4 far=texture2D(tFarBlur,vUv);
+          vec4 near=texture2D(tNearBlur,vUv);
+          // The original focused image retains all fine details at the focal plane.
+          // Gradually replace it with depth-isolated defocus behind the focus plane.
+          float farMix=smoothstep(.8,2.0,c)*smoothstep(.01,.35,far.a);
+          vec3 back=mix(sharp,far.rgb,farMix);
+          // Foreground blurring behaves like a translucent, premultiplied disk
+          // that covers the scene behind it. No extra copy of the sharp object.
+          vec3 color=near.rgb+back*(1.-near.a);
+          gl_FragColor=vec4(color,1.);
+        }
+      `,depthTest:false,depthWrite:false,toneMapped:false});
+    // Sensor noise is deliberately evaluated BEFORE ACES / sRGB, in electrons.
+    // Temporal shot+dark+read variance follows a Gaussian approximation to
+    // Poisson photon statistics; fixed PRNU/DSNU and row/column offsets use
+    // detector-pixel coordinates and DO NOT shimmer with time.
+    const postUniforms={
+      tInput:{value:dofRT.texture},uResolution:{value:new THREE.Vector2(1,1)},
+      uOutputSize:{value:new THREE.Vector2(1,1)},
+      uAberration:{value:S.aberration},uDebug:{value:0},uExposure:{value:1.0},
+      uCCDEnabled:{value:1},uSignal18:{value:S.signal18},
+      uNoiseStrength:{value:S.noiseStrength},uChromaNoise:{value:S.chromaNoise},
+      uReadNoise:{value:S.readNoise},uPRNU:{value:S.prnu*.01},
+      uBanding:{value:S.banding},uDarkCurrent:{value:S.darkCurrent},
+      uIntegration:{value:S.exposureSec},uHotPPM:{value:S.hotPixels},
+      uFullWell:{value:28000},uADCBits:{value:S.adcBits},
+      uFrame:{value:0},uCosmic:{value:new THREE.Vector4(-1,-1,0,0)}
+    };
+    const postMaterial=new THREE.ShaderMaterial({uniforms:postUniforms,vertexShader:passVertex,
+      fragmentShader:`
+        precision highp float;
+        uniform sampler2D tInput;
+        uniform vec2 uResolution,uOutputSize;
+        uniform float uAberration,uExposure;
+        uniform int uDebug,uCCDEnabled,uADCBits;
+        uniform float uSignal18,uReadNoise,uPRNU,uBanding,uDarkCurrent;
+        uniform float uNoiseStrength,uChromaNoise;
+        uniform float uIntegration,uHotPPM,uFullWell,uFrame;
+        uniform vec4 uCosmic; // normalized x/y, charge factor, orientation radians
+        varying vec2 vUv;
+
+        // Filmic tone mapping and sRGB encoding come strictly AFTER the sensor.
+        vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
+        vec3 srgb(vec3 x){
+          vec3 lo=12.92*x;
+          vec3 hi=1.055*pow(max(x,vec3(0.)),vec3(1./2.4))-.055;
+          return mix(lo,hi,step(vec3(.0031308),x));
+        }
+        // Fast stable pseudo-random sampling, no texture asset required.
+        float hash21(vec2 p){
+          vec3 q=fract(vec3(p.xyx)*.1031);
+          q+=dot(q,q.yzx+33.33);
+          return fract((q.x+q.y)*q.z);
+        }
+        float normalSample(vec2 p){
+          float a=max(hash21(p),.000001);
+          float b=hash21(p+vec2(47.321,123.741));
+          return sqrt(-2.*log(a))*cos(6.28318530718*b);
+        }
+        // Bilinearly interpolated seeded value noise. A real CFA plus color
+        // reconstruction creates small correlated chromatic patches, not
+        // independent RGB salt-and-pepper dots or giant smooth colored clouds.
+        float smoothHashNoise(vec2 p,float seed){
+          vec2 i=floor(p),f=fract(p);
+          f=f*f*(3.-2.*f);
+          // Animate hash values, not pixel positions. Texture remains anchored
+          // to the sensor raster; each readout is a new stochastic realization.
+          i+=vec2(seed*41.73,seed*93.47);
+          float a=hash21(i),b=hash21(i+vec2(1.,0.));
+          float c=hash21(i+vec2(0.,1.)),d=hash21(i+vec2(1.,1.));
+          return 2.*mix(mix(a,b,f.x),mix(c,d,f.x),f.y)-1.;
+        }
+        vec3 ccdResponse(vec3 linearSignal){
+          // Renderer HDR is not absolute irradiance: calibrate to a user-defined
+          // charge count for a linear 18% reflectance reference pixel.
+          float electronsPerUnit=uSignal18/.18;
+          vec3 photons=max(linearSignal,vec3(0.))*electronsPerUnit;
+          vec2 pixel=floor(gl_FragCoord.xy); // stable CCD sensor pixel grid
+          // PRNU is a FIXED pixel sensitivity variation, not animated grain.
+          float prnu=normalSample(pixel+vec2(19.17,225.9))*uPRNU;
+          photons*=max(0.,1.+prnu);
+          float dark=uDarkCurrent*uIntegration;
+          // Small fixed pixel-offset (DSNU) in electrons, with occasional hot pixels.
+          float dsnu=normalSample(pixel+vec2(157.9,78.3))*.65;
+          float hot=(hash21(pixel+vec2(509.7,241.9)) < uHotPPM*.000001)?
+                    uFullWell*(.08+.6*hash21(pixel+vec2(437.2,95.8))):0.;
+          // CCD readout: pixel-column fixed bias, slow grouped vertical stripes,
+          // plus frame-varying row-correlated reset bias.
+          float col=normalSample(vec2(pixel.x+39.5,112.8))*.68+
+                    normalSample(vec2(floor(pixel.x/16.)+7.8,192.4))*.32;
+          float row=normalSample(vec2(pixel.y+17.8,uFrame*1.73+53.4))*.35;
+          float bias=(col+row)*uBanding;
+          // Independent stochastic photon (shot), dark-current, and read noise.
+          // Variances ADD in electrons²; Gaussian approximates Poisson for
+          // normal daylight charge levels, less accurately in extreme darkness.
+          vec3 variance=photons+vec3(dark+uReadNoise*uReadNoise);
+          vec2 frameSeed=vec2(uFrame*3.11,uFrame*7.39);
+          // Shared luminance noise (from demosaicing/luma processing) accounts
+          // for most fine grain; residual channel-specific noise is weaker.
+          // Each channel retains approximately unit Gaussian variance.
+          float luminanceNoise=normalSample(pixel+frameSeed+vec2(11.3,43.7));
+          vec3 z=vec3(
+            .82*luminanceNoise+.572*normalSample(pixel+frameSeed+vec2(91.1,83.1)),
+            .82*luminanceNoise+.572*normalSample(pixel+frameSeed+vec2(169.9,173.7)),
+            .82*luminanceNoise+.572*normalSample(pixel+frameSeed+vec2(283.7,41.3))
+          );
+          vec3 charge=photons+vec3(dark+dsnu+bias+hot)+sqrt(max(variance,vec3(0.)))*z*uNoiseStrength;
+          // Rare energetic particle strikes: transient, short luminous tracks.
+          if(uCosmic.z>0.){
+            vec2 difference=pixel-uCosmic.xy*uOutputSize;
+            vec2 direction=vec2(cos(uCosmic.w),sin(uCosmic.w));
+            float along=dot(difference,direction);
+            float perpendicular=length(difference-direction*clamp(along,-4.5,4.5));
+            float hit=(1.-smoothstep(.35,1.55,perpendicular)) *
+                      (1.-smoothstep(3.4,6.0,abs(along)));
+            charge+=vec3(hit*uFullWell*uCosmic.z);
+          }
+          // Well saturation precedes ADC quantization (digital number).
+          float codes=exp2(float(uADCBits))-1.;
+          charge=floor(clamp(charge,vec3(0.),vec3(uFullWell))*(codes/uFullWell)+.5)*(uFullWell/codes);
+          // Subtract mean dark pedestal, but preserve DSNU and random residuals.
+          return max((charge-vec3(dark))/electronsPerUnit,vec3(0.));
+        }
+        void main(){
+          if(uDebug!=0){gl_FragColor=vec4(texture2D(tInput,vUv).rgb,1.);return;}
+          // LATERAL CHROMATIC ABERRATION: wavelength-dependent magnification
+          // increases radially toward the frame corners, not uniformly along x.
+          vec2 fromAxisPx=(vUv-vec2(.5))*uResolution;
+          float normalizedField=clamp(length(fromAxisPx)/max(.5*length(uResolution),.00001),0.,1.);
+          vec2 radialDir=fromAxisPx/max(length(fromAxisPx),.00001);
+          float rim=smoothstep(.15,.90,normalizedField);
+          float fringePx=uAberration*rim*pow(normalizedField,3.);
+          vec2 redUV=clamp(vUv+radialDir*(fringePx*.85)/uResolution,vec2(0.),vec2(1.));
+          vec2 blueUV=clamp(vUv-radialDir*(fringePx*1.15)/uResolution,vec2(0.),vec2(1.));
+          vec3 rgb=vec3(texture2D(tInput,redUV).r,texture2D(tInput,vUv).g,texture2D(tInput,blueUV).b);
+          // Subtle highlight halation is optical and must precede electronic noise.
+          vec3 halo=vec3(0.);
+          for(int j=0;j<8;j++){
+            float a=float(j)*.78539816339;
+            vec2 offs=vec2(cos(a),sin(a))*6./uResolution;
+            halo+=max(texture2D(tInput,clamp(vUv+offs,vec2(0.),vec2(1.))).rgb-vec3(1.45),vec3(0.));
+          }
+          rgb+=halo*(.0175/8.);
+          rgb*=uExposure;
+          if(uCCDEnabled!=0)rgb=ccdResponse(rgb);
+          rgb=srgb(aces(rgb));
+          if(uCCDEnabled!=0 && uNoiseStrength>0. && uChromaNoise>0.){
+            // Small CFA/ISP color-error fields. These follow screen pixels,
+            // are subdued in daylight and appear chiefly in underexposed areas.
+            // The 3–5 px structures are interpolated, never block-shaped.
+            float Y=dot(rgb,vec3(.2126,.7152,.0722));
+            float shadow=1.-smoothstep(.045,.52,Y);
+            float chromaAmp=(.007+.50/sqrt(max(uSignal18,80.)))*
+                uNoiseStrength*uChromaNoise*(.08+.92*shadow);
+            vec2 p=gl_FragCoord.xy;
+            float a=smoothHashNoise(p/3.2+vec2(73.6,17.3),uFrame+11.);
+            float b=smoothHashNoise(p/4.8+vec2(21.8,119.4),uFrame+101.);
+            // Faint persistent color shading remains fixed on the detector.
+            float fixedPatternNoise=smoothHashNoise(p/5.1+vec2(211.4,39.7),-73.2)*.10;
+            a+=fixedPatternNoise;b-=fixedPatternNoise*.6;
+            vec3 chroma=vec3(.8*a+.12*b,-.42*a-.29*b,.81*b-.14*a);
+            rgb+=chroma*chromaAmp;
+          }
+          gl_FragColor=vec4(clamp(rgb,vec3(0.),vec3(1.)),1.);
+        }
+      `,depthTest:false,depthWrite:false,toneMapped:false});
+
+
+// --- 2D occupancy planner with robot-radius clearance, plus Rapier raycast sensors ---
+const CELL=.35, XMIN=-8.25, XMAX=8.25, ZMIN=-6.25, ZMAX=6.25;
+const NX=Math.floor((XMAX-XMIN)/CELL)+1,NZ=Math.floor((ZMAX-ZMIN)/CELL)+1;
+const cellToWorld=(ix,iz)=>({x:XMIN+ix*CELL,z:ZMIN+iz*CELL});
+function obstructed(x,z,clearance=.64){
+  if(Math.abs(x)>8.3-clearance||Math.abs(z)>6.3-clearance)return true;
+  for(const e of objects){
+    const pos=e.body.translation(),quat=e.body.rotation();
+    const theta=new THREE.Euler().setFromQuaternion(new THREE.Quaternion(quat.x,quat.y,quat.z,quat.w),'YXZ').y;
+    const dx=x-pos.x,dz=z-pos.z,c=Math.cos(theta),s=Math.sin(theta);
+    const rx=dx*c+dz*s,rz=-dx*s+dz*c;
+    if(Math.abs(rx)<e.dims[0]*.5+clearance && Math.abs(rz)<e.dims[2]*.5+clearance)return true;
+  }
+  return false;
+}
+function clearSegment(a,b){const d=Math.hypot(b.x-a.x,b.z-a.z);let n=Math.max(1,Math.ceil(d/.20));for(let i=1;i<=n;i++){
+  const t=i/n;if(obstructed(lerp(a.x,b.x,t),lerp(a.z,b.z,t)))return false;
+ }return true;}
+function reconstructPath(parent,end,start){let ids=[],p=end;for(let i=0;i<NX*NZ+1;i++){
+  ids.push(p);if(p===start)break;p=parent[p];if(p===-1)break;
+ }ids.reverse();return ids.map(id=>cellToWorld(id%NX,Math.floor(id/NX)));}
+function planRoute(){
+  if(!robot)return;needReplan=false;planCountdown=2.5;
+  const pos=robot.body.translation(),start={x:pos.x,z:pos.z};
+  // Start/end are allowed inside their own immediate inflated envelopes.
+  const sx=clamp(Math.round((start.x-XMIN)/CELL),0,NX-1),sz=clamp(Math.round((start.z-ZMIN)/CELL),0,NZ-1);
+  const gx=clamp(Math.round((goal.x-XMIN)/CELL),0,NX-1),gz=clamp(Math.round((goal.z-ZMIN)/CELL),0,NZ-1);
+  const st=sz*NX+sx,en=gz*NX+gx,N=NX*NZ;
+  if(clearSegment(start,goal)){path=[goal];waypoint=0;drawPath();return;}
+  const blocked=new Uint8Array(N);
+  for(let iz=0;iz<NZ;iz++)for(let ix=0;ix<NX;ix++){const p=cellToWorld(ix,iz);blocked[iz*NX+ix]=obstructed(p.x,p.z)?1:0;}
+  blocked[st]=0;blocked[en]=0;
+  const gScore=new Float32Array(N).fill(1e20),parent=new Int32Array(N).fill(-1),closed=new Uint8Array(N);
+  const heuristic=id=>Math.hypot((id%NX)-gx,Math.floor(id/NX)-gz);
+  const heap=[];
+  function push(id,f){heap.push({id,f});let i=heap.length-1;while(i>0){const p=(i-1)>>1;if(heap[p].f<=f)break;heap[i]=heap[p];i=p;}heap[i]={id,f};}
+  function pop(){const ret=heap[0],last=heap.pop();if(heap.length){let i=0;while(true){let l=i*2+1;if(l>=heap.length)break;let r=l+1,c=(r<heap.length&&heap[r].f<heap[l].f)?r:l;if(last.f<=heap[c].f)break;heap[i]=heap[c];i=c;}heap[i]=last;}return ret.id;}
+  gScore[st]=0;push(st,heuristic(st));let reached=false;
+  const offsets=[[-1,0,1],[1,0,1],[0,-1,1],[0,1,1],[-1,-1,1.4142],[-1,1,1.4142],[1,-1,1.4142],[1,1,1.4142]];
+  let count=0;
+  while(heap.length&&count++<N*7){const id=pop();if(closed[id])continue;closed[id]=1;if(id===en){reached=true;break;}
+    const x=id%NX,z=Math.floor(id/NX);
+    for(const [dx,dz,cost] of offsets){const xx=x+dx,zz=z+dz;if(xx<0||xx>=NX||zz<0||zz>=NZ)continue;
+      const ni=zz*NX+xx;if(blocked[ni]||closed[ni])continue;
+      if(dx&&dz && (blocked[z*NX+xx]||blocked[zz*NX+x]))continue;
+      const ng=gScore[id]+cost;if(ng>=gScore[ni])continue;gScore[ni]=ng;parent[ni]=id;push(ni,ng+heuristic(ni));}
+  }
+  if(!reached){path=[];waypoint=0;drawPath();log('Planner: destination blocked — select a clear floor point');return;}
+  const points=reconstructPath(parent,en,st);points[0]=start;points[points.length-1]=goal;
+  const simplified=[];let cursor=0;while(cursor<points.length-1){let next=cursor+1;for(let i=points.length-1;i>cursor+1;i--){if(clearSegment(points[cursor],points[i])){next=i;break;}}
+    simplified.push(points[next]);cursor=next;
+  }
+  path=simplified;waypoint=0;drawPath();log(`Planner: ${points.length} grid nodes → ${path.length} waypoints`);
+}
+function drawPath(){
+ if(path.length===0){pathLine.visible=false;return;}
+ const pos=robot?.body.translation()||{x:0,z:0};let pts=[new THREE.Vector3(pos.x,.055,pos.z)];
+ for(const p of path)pts.push(new THREE.Vector3(p.x,.055,p.z));
+ pathLine.geometry.dispose();pathLine.geometry=new THREE.BufferGeometry().setFromPoints(pts);pathLine.visible=$('showRoute').checked;
+}
+function robotPose(){const p=robot.body.translation(),q=robot.body.rotation();const quat=new THREE.Quaternion(q.x,q.y,q.z,q.w);const fwd=new THREE.Vector3(0,0,1).applyQuaternion(quat);const yaw=Math.atan2(fwd.x,fwd.z);return {x:p.x,z:p.z,y:p.y,yaw,fwd};}
+function scanLidar(){if(!world||!robot)return;const p=robotPose(),max=Number($('sensorRange').value);
+ for(let i=0;i<5;i++){
+  const a=p.yaw+beamAngles[i],dir={x:Math.sin(a),y:0,z:Math.cos(a)};
+  const ray=new RAPIER.Ray({x:p.x,y:p.y+.06,z:p.z},dir);
+  const hit=world.castRay(ray,max,true,undefined,undefined,undefined,robot.body);
+  // Since sensor origin is above the floor, ray hits only other collider bodies.
+  sensorReadings[i]=hit?hit.timeOfImpact??hit.toi??max:max;
+  const line=rayLines.children[i];const t=sensorReadings[i];const attr=line.geometry.getAttribute('position');
+  attr.setXYZ(0,p.x,p.y+.08,p.z);attr.setXYZ(1,p.x+dir.x*t,p.y+.08,p.z+dir.z*t);attr.needsUpdate=true;
+  line.material.color.setHex(t<.8?0xf6a379:(i===2?0x8af9d1:0x6abccb));
+ }
+ rayLines.visible=$('showSensors').checked;
+}
+function computeDecision(){
+ if(!robot||!world)return;
+ const pose=robotPose(),target=path[Math.min(waypoint,path.length-1)]||goal;
+ let dx=target.x-pose.x,dz=target.z-pose.z,dist=Math.hypot(dx,dz);
+ if(path.length>1&&dist<.8&&waypoint<path.length-1){waypoint++;drawPath();}
+ const next=path[Math.min(waypoint,path.length-1)]||goal;dx=next.x-pose.x;dz=next.z-pose.z;
+ const theta=Math.atan2(dx*Math.cos(pose.yaw)-dz*Math.sin(pose.yaw),dx*Math.sin(pose.yaw)+dz*Math.cos(pose.yaw));
+ const goalDistance=Math.hypot(goal.x-pose.x,goal.z-pose.z);
+ let forward=clamp(1.0-Math.abs(theta)*.6,0,1),turn=clamp(theta*1.6,-1,1);
+ if(currentKind==='wheeled'){
+  const clear=sensorReadings[2];if(clear<.68){forward=0;turn=sensorReadings[0]>sensorReadings[4]?-.85:.85;}
+  else if(clear<1.35)forward*=.5;
+ }
+ if(goalDistance<.65||(!path.length&&goalDistance>.9))forward=0;
+ drive={v:forward*1.4,w:turn*1.5,action:forward<=0?5:0,confidence:0};
+ $('actionRead').textContent=currentKind==='wheeled'?'PATH FOLLOW':'GAIT CONTROL';
+ $('distRead').textContent=goalDistance.toFixed(1);
+ $('lidarRead').textContent=currentKind==='wheeled'?Math.min(...sensorReadings).toFixed(2)+' m':'N/A';
+ $('sensorBar').style.width=currentKind==='wheeled'?clamp(Math.min(...sensorReadings)/Number($('sensorRange').value)*100,0,100)+'%':'0%';
+}
+function applyRobotControl(dt){
+ if(!rig||paused)return;
+ const s=rigSensors(rig);
+ let throttle=clamp(drive.v/1.4,-1,1),turn=clamp(drive.w/1.5,-1,1);
+ if(!autonomous){
+  throttle=((keys.w||keys.ArrowUp)?1:0)-((keys.s||keys.ArrowDown)?1:0);
+  turn=((keys.d||keys.ArrowRight)?1:0)-((keys.a||keys.ArrowLeft)?1:0);
+ }
+ if(currentKind!=='wheeled'){
+  // Legs are NEVER translated or pushed externally. Only revolute joints
+  // receive torque-limited position commands and foot contact creates motion.
+  throttle=autonomous?clamp(drive.v/1.4,0,1):throttle;
+ }
+ if(estop){for(const m of rig.motors)m.joint.configureMotorVelocity(0,4);return;}
+ const act=driveRig(rig,controllerTheta,rig.clock,{throttle,turn});rig.clock+=dt;
+ if(!training){$('torqueDemand').textContent=(act.torqueDemand||0).toFixed(2)+' (proxy)';$('torqueBar').style.width=Math.min(100,(act.torqueDemand||0)/110*100)+'%';}
+ actualSpeed=s.vel;
+}
+function updateStuck(dt){if(!robot||!autonomous||estop)return;const p=robot.body.translation();if(!lastPos){lastPos={x:p.x,z:p.z};return;}
+ const moved=Math.hypot(p.x-lastPos.x,p.z-lastPos.z);lastPos={x:p.x,z:p.z};
+ const attempting=drive.v>.3,blocked=sensorReadings[2]<.5;
+ stuck=clamp(stuck+(attempting&&moved<.006?.025:-.065),0,1);
+ if(stuck>.8&&planCountdown<1){needReplan=true;planCountdown=1.6;}
+}
+function syncObjects(){
+ for(const e of objects){if(!e?.dynamic)continue;const p=e.body.translation(),q=e.body.rotation();e.mesh.position.set(p.x,p.y,p.z);e.mesh.quaternion.set(q.x,q.y,q.z,q.w);}
+ if(robot&&rig){syncRigVisuals();const p=robot.body.translation(),a=robot.body.angvel(),sense=rigSensors(rig);
+  $('linearRead').textContent=Math.abs(actualSpeed).toFixed(2);$('turnRead').textContent=a.y.toFixed(2);
+  $('robotState').textContent=estop?'E-STOP: MOTOR VELOCITY TARGETS ZERO':`${currentKind.toUpperCase()} / ${rig.links.length} physical rigid links / ${sense.upright>.55?'UPRIGHT':'TILTED / FALLEN'}`;
+  if(selected===robot&&document.activeElement?.tagName!=='INPUT')refreshInspector();
+ }
+}
+function updateMap(){const c=$('minimap'),ctx=c.getContext('2d');if(!ctx)return;const w=c.width,h=c.height;
+ ctx.clearRect(0,0,w,h);ctx.fillStyle='#0e1b24';ctx.fillRect(0,0,w,h);
+ const pt=(x,z)=>[w*(x+9)/18,h*(z+7)/14];
+ ctx.strokeStyle='#233744';ctx.lineWidth=.5;for(let x=-9;x<9;x++){const p=pt(x,0);ctx.beginPath();ctx.moveTo(p[0],0);ctx.lineTo(p[0],h);ctx.stroke();}
+ for(let z=-7;z<7;z++){const p=pt(0,z);ctx.beginPath();ctx.moveTo(0,p[1]);ctx.lineTo(w,p[1]);ctx.stroke();}
+ for(const e of objects){const pos=e.body.translation(),a=pt(pos.x,pos.z),scx=e.dims[0]/18*w,scz=e.dims[2]/14*h;
+ ctx.save();ctx.translate(a[0],a[1]);const q=e.body.rotation();ctx.rotate(2*Math.atan2(q.y,q.w));ctx.fillStyle=e.dynamic?'#8a795f':'#3b6372';ctx.fillRect(-scx/2,-scz/2,scx,scz);ctx.restore();}
+ if(path.length){ctx.strokeStyle='#69dcbc';ctx.lineWidth=1.4;ctx.setLineDash([4,3]);ctx.beginPath();const p=robot.body.translation(),a=pt(p.x,p.z);ctx.moveTo(...a);for(const node of path)ctx.lineTo(...pt(node.x,node.z));ctx.stroke();ctx.setLineDash([]);}
+ const gp=pt(goal.x,goal.z);ctx.strokeStyle='#90f9d2';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(gp[0],gp[1],5,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(gp[0]-8,gp[1]);ctx.lineTo(gp[0]+8,gp[1]);ctx.moveTo(gp[0],gp[1]-8);ctx.lineTo(gp[0],gp[1]+8);ctx.stroke();
+ if(robot){const p=robotPose(),a=pt(p.x,p.z);ctx.fillStyle='#8df2d6';ctx.save();ctx.translate(...a);ctx.rotate(-p.yaw);ctx.beginPath();ctx.moveTo(0,9);ctx.lineTo(-6,-7);ctx.lineTo(6,-7);ctx.closePath();ctx.fill();ctx.restore();}
+}
+// --- Camera-space thin-lens continuous autofocus, pointed at the view reticle ---
+function updateAutofocus(dt){if(!$('autofocus').checked)return;
+ const center=new THREE.Vector2(0,0);raycaster.setFromCamera(center,camera);
+ const candidates=[floor,...objects.map(o=>o.mesh),...(robot?[robot.mesh]:[])];
+ const hits=raycaster.intersectObjects(candidates,true);let distance;
+ if(hits.length){const p=camera.worldToLocal(hits[0].point.clone());distance=-p.z;}
+ else{distance=camera.position.distanceTo(orbit.target);}
+ if(Number.isFinite(distance))S.targetFocus=clamp(distance,1.2,95);
+ S.focus=THREE.MathUtils.damp(S.focus,S.targetFocus,5,dt);
+ $('focusRead').textContent=S.focus.toFixed(2)+' m';
+}
+function setGoal(x,z){if(!Number.isFinite(x)||!Number.isFinite(z))return;
+ goal={x:clamp(x,-7.8,7.8),z:clamp(z,-5.8,5.8)};goalMarker.position.set(goal.x,0,goal.z);
+ $('goalCoords').textContent=goal.x.toFixed(1)+', '+goal.z.toFixed(1);
+ $('goalBadge').classList.remove('set');settingGoal=false;needReplan=true;log(`Navigation goal → (${goal.x.toFixed(1)}, ${goal.z.toFixed(1)})`);
+}
+function resetRobot(){if(!robot)return;moveEntity(robot,0,4.4,Math.PI);drive={v:0,w:0,action:5,confidence:0};lastPos=null;stuck=0;estop=false;
+ $('stopBtn').classList.remove('active');needReplan=true;log('Robot reset to spawn');}
+function setManual(manual){autonomous=!manual;drive.v=0;drive.w=0;$('autoBtn').classList.toggle('active',autonomous);$('manualBtn').classList.toggle('active',!autonomous);log(autonomous?'Autonomous / trained joint policy':'Manual high-level steering / physical motors');}
+function beginGoal(){settingGoal=true;$('goalBadge').classList.add('set');$('goalCoords').textContent='CLICK FLOOR';}
+function editInput(){if(!selected)return;moveEntity(selected,parseFloat($('posX').value),parseFloat($('posZ').value),THREE.MathUtils.degToRad(parseFloat($('rotation').value)));}
+for(const id of ['posX','posZ','rotation'])$(id).addEventListener('change',editInput);
+$('rotation').addEventListener('input',()=>{$('rotationOut').textContent=$('rotation').value+'°';});
+$('deleteBtn').onclick=()=>deleteEntity(selected);
+$('duplicateBtn').onclick=()=>{if(selected && selected!==robot){const p=selected.mesh.position;selectEntity(createEntity(selected.type,clamp(p.x+1.1,-7.8,7.8),clamp(p.z+.7,-5.8,5.8),selected.mesh.rotation.y));}};
+for(const b of document.querySelectorAll('[data-add]'))b.onclick=()=>{const base=orbit.target,e=createEntity(b.dataset.add,clamp(base.x+(Math.random()-.5)*1.5,-7.3,7.3),clamp(base.z+(Math.random()-.5)*1.5,-5.3,5.3));selectEntity(e);log('Added '+e.name);};
+function setTool(mode){transform.setMode(mode);$('toolT').classList.toggle('active',mode==='translate');$('toolR').classList.toggle('active',mode==='rotate');}
+$('toolT').onclick=()=>setTool('translate');$('toolR').onclick=()=>setTool('rotate');
+$('setGoalBtn').onclick=beginGoal;
+$('autoBtn').onclick=()=>setManual(false);$('manualBtn').onclick=()=>setManual(true);
+$('stopBtn').onclick=()=>{estop=!estop;$('stopBtn').classList.toggle('active',estop);if(estop){drive.v=0;drive.w=0;log('E-STOP engaged');}else log('E-STOP released');};
+$('playBtn').onclick=()=>{paused=!paused;$('playBtn').textContent=paused?'▶  RESUME':'Ⅱ  PAUSE';log(paused?'Simulation paused':'Simulation resumed');};
+$('resetBtn').onclick=resetRobot;
+$('population').oninput=()=>{$('populationOut').textContent=$('population').value+' / generation';};
+$('lanes').oninput=()=>{$('lanesOut').textContent=$('lanes').value+' ghost robots';};
+$('workers').oninput=()=>{$('workersOut').textContent=$('workers').value+' real workers';};
+$('showGhosts').onchange=()=>{if(!$('showGhosts').checked)clearGhosts();};
+$('showRoute').onchange=()=>{pathLine.visible=$('showRoute').checked&&path.length>0;};
+$('showSensors').onchange=()=>{rayLines.visible=$('showSensors').checked;};
+$('maxSpeed').oninput=()=>{$('speedOut').textContent=Number($('maxSpeed').value).toFixed(1)+' m/s';};
+$('sensorRange').oninput=()=>{$('rangeOut').textContent=Number($('sensorRange').value).toFixed(1)+' m';};
+$('focal').oninput=()=>{S.focal=Number($('focal').value);$('focalOut').textContent=S.focal+' mm';};
+$('aperture').oninput=()=>{S.aperture=Number($('aperture').value);$('apertureOut').textContent='ƒ/'+S.aperture.toFixed(1);$('afstopRead').textContent=S.aperture.toFixed(1);};
+$('aberration').oninput=()=>{S.aberration=Number($('aberration').value);$('aberrationOut').textContent=S.aberration.toFixed(1)+' px';};
+$('noise').oninput=()=>{S.noiseStrength=Number($('noise').value);$('noiseOut').textContent=Math.round(S.noiseStrength*100)+'%';};
+$('blur').oninput=()=>{S.maxBlur=Number($('blur').value);$('blurOut').textContent=S.maxBlur+' px';};
+$('dof').onchange=()=>S.enabled=$('dof').checked;
+$('ccd').onchange=()=>S.ccdEnabled=$('ccd').checked;
+$('resolution').onchange=()=>{S.scale=Number($('resolution').value);resize(true);};
+$('autofocus').onchange=()=>{$('afmodeRead').textContent=$('autofocus').checked?'RETICLE':'LOCKED';};
+$('viewMode').onclick=()=>{
+ if($('viewMode').textContent==='PERSPECTIVE'){
+   camera.position.set(.001,23,0.001);orbit.target.set(0,0,0);orbit.update();$('viewMode').textContent='TOP DOWN';
+ }else{camera.position.set(10,11,15);orbit.target.set(0,.8,0);orbit.update();$('viewMode').textContent='PERSPECTIVE';}
+};
+window.addEventListener('keydown',e=>{
+ const active=document.activeElement?.tagName;if(['INPUT','SELECT','TEXTAREA'].includes(active))return;
+ keys[e.key.toLowerCase()]=true;keys[e.key]=true;
+ if(['w','a','s','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();if(autonomous)setManual(true);}
+ if(e.key.toLowerCase()==='g'){beginGoal();e.preventDefault();}
+ if(e.key.toLowerCase()==='t')setTool('translate');if(e.key.toLowerCase()==='r')setTool('rotate');
+ if(e.key==='Delete'||e.key==='Backspace'){deleteEntity(selected);e.preventDefault();}
+ if(e.key===' '){$('playBtn').click();e.preventDefault();}
+});window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;keys[e.key]=false;});
+let pointerStart=null;
+renderer.domElement.addEventListener('pointerdown',e=>{pointerStart={x:e.clientX,y:e.clientY,button:e.button};});
+renderer.domElement.addEventListener('pointerup',e=>{
+ if(!pointerStart||transform.dragging||pointerStart.button!==0||Math.hypot(pointerStart.x-e.clientX,pointerStart.y-e.clientY)>5)return;
+ const rect=renderer.domElement.getBoundingClientRect();ndc.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(ndc,camera);
+ if(settingGoal){const hit=raycaster.intersectObject(floor);if(hit.length)setGoal(hit[0].point.x,hit[0].point.z);return;}
+ const hits=raycaster.intersectObjects([robot.mesh,...objects.map(o=>o.mesh)],true);
+ if(hits.length){const entity=hits.find(h=>h.object.userData.entity)?.object.userData.entity;if(entity)selectEntity(entity);}
+});
+function exportTwin(){const payload={schema:'floorplan.twin.v1',version:1,goal,robotType:currentKind,robot:{x:robot.mesh.position.x,z:robot.mesh.position.z,heading:robot.mesh.rotation.y},
+  objects:objects.map(e=>({type:e.type,x:e.mesh.position.x,z:e.mesh.position.z,heading:e.mesh.rotation.y,name:e.name})),
+  lens:{focal:S.focal,aperture:S.aperture,aberration:S.aberration,grain:S.noiseStrength}};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob);
+ const link=document.createElement('a');link.href=url;link.download='shop-floor-twin.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),3000);log('Exported digital twin scene JSON');}
+$('exportBtn').onclick=exportTwin;$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;
+ try{const data=JSON.parse(await file.text());if(data.schema!=='floorplan.twin.v1'||!Array.isArray(data.objects)||data.objects.length>120)throw Error('Invalid scene schema');
+ for(const en of [...objects])deleteEntity(en);
+ for(const en of data.objects){if(!shapeConfig[en.type])continue;
+   createEntity(en.type,clamp(Number(en.x)||0,-7.8,7.8),clamp(Number(en.z)||0,-5.8,5.8),Number(en.heading)||0,String(en.name||'').slice(0,60));}
+ if(data.robotType&&data.robotType!==currentKind)stopAndSwitch(data.robotType);
+ if(data.robot)moveEntity(robot,Number(data.robot.x)||0,Number(data.robot.z)||0,Number(data.robot.heading)||0);
+ if(data.goal)setGoal(Number(data.goal.x),Number(data.goal.z));
+ selectEntity(robot);log('Imported scene with '+objects.length+' equipment items');
+ }catch(err){warn('Import rejected: '+err.message);}finally{$('importFile').value='';}
+};
+// The previous 1.6 KiB imitation classifier has been retired. A genuine
+// physically evaluated motor policy and 12->24->5 predictive MLP are trained
+// in the browser, persisted per morphology, and can be exported.
+// --- Render pipeline: physical CoC + separated aperture bokeh + radial CA / CCD noise ---
+let w=0,h=0;
+function resize(force=false){const W=Math.max(2,view.clientWidth),H=Math.max(2,view.clientHeight);
+ const dpr=Math.min(window.devicePixelRatio||1,1.5)*S.scale;
+ const budget=Math.min(1,1600/(Math.max(W,H)*dpr));
+ const nextW=Math.max(2,Math.floor(W*dpr*budget)),nextH=Math.max(2,Math.floor(H*dpr*budget));
+ if(!force&&w===nextW&&h===nextH)return;w=nextW;h=nextH;
+ renderer.setSize(W,H,false);renderer.domElement.style.width='100%';renderer.domElement.style.height='100%';
+ camera.aspect=W/H;camera.updateProjectionMatrix();frameRT.setSize(w,h);dofRT.setSize(w,h);
+ const hw=Math.max(2,Math.ceil(w/2)),hh=Math.max(2,Math.ceil(h/2));
+ for(const rt of [nearLayerRT,farLayerRT,nearBlurRT,farBlurRT])rt.setSize(hw,hh);
+ sharedOptics.uResolution.value.set(w,h);diskUniforms.uHalfResolution.value.set(hw,hh);
+ postUniforms.uResolution.value.set(w,h);postUniforms.uOutputSize.value.set(W,H);
+}
+let cosmicHit=null,activeSensorFrame=0,lastSensorFrame=-1;
+function renderOptics(time){
+ const gateHeight=Math.min(sensorHeightMM,sensorWidthMM/camera.aspect),gateWidth=gateHeight*camera.aspect;
+ camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(gateHeight/(2*S.focal)));
+ camera.updateProjectionMatrix();
+ sharedOptics.uSensorWidth.value=gateWidth;sharedOptics.uFocal.value=S.focal;
+ sharedOptics.uFstop.value=S.aperture;sharedOptics.uFocus.value=S.focus;sharedOptics.uMaxBlur.value=S.maxBlur;
+ diskUniforms.uSamples.value=S.samples;
+ compositeUniforms.uEnabled.value=(S.enabled&&S.maxBlur>0)?1:0;compositeUniforms.uDebug.value=S.debug;
+ postUniforms.uAberration.value=S.aberration;postUniforms.uDebug.value=S.debug;
+ postUniforms.uCCDEnabled.value=S.ccdEnabled?1:0;
+ postUniforms.uSignal18.value=S.signal18;postUniforms.uNoiseStrength.value=S.noiseStrength;
+ postUniforms.uChromaNoise.value=S.chromaNoise;postUniforms.uReadNoise.value=S.readNoise;
+ postUniforms.uPRNU.value=S.prnu*.01;postUniforms.uBanding.value=S.banding;
+ postUniforms.uDarkCurrent.value=S.darkCurrent;postUniforms.uIntegration.value=S.exposureSec;
+ postUniforms.uHotPPM.value=0;postUniforms.uADCBits.value=S.adcBits;
+ activeSensorFrame=Math.floor(time*S.ccdHz);postUniforms.uFrame.value=activeSensorFrame;
+ postUniforms.uCosmic.value.set(-1,-1,0,0);
+ if(shaderFault){renderer.setRenderTarget(null);renderer.render(scene,camera);return;}
+ renderer.setRenderTarget(frameRT);renderer.render(scene,camera);
+ if(S.enabled&&S.debug===0&&S.maxBlur>0){
+  quad.material=layerMaterial;layerUniforms.uLayer.value=0;renderer.setRenderTarget(farLayerRT);renderer.render(ppScene,ppCamera);
+  layerUniforms.uLayer.value=1;renderer.setRenderTarget(nearLayerRT);renderer.render(ppScene,ppCamera);
+  quad.material=diskMaterial;diskUniforms.uIsNear.value=0;diskUniforms.uLayerTexture.value=farLayerRT.texture;
+  renderer.setRenderTarget(farBlurRT);renderer.render(ppScene,ppCamera);
+  diskUniforms.uIsNear.value=1;diskUniforms.uLayerTexture.value=nearLayerRT.texture;
+  renderer.setRenderTarget(nearBlurRT);renderer.render(ppScene,ppCamera);
+ }
+ quad.material=compositeMaterial;renderer.setRenderTarget(dofRT);renderer.render(ppScene,ppCamera);
+ quad.material=postMaterial;renderer.setRenderTarget(null);renderer.render(ppScene,ppCamera);
+}
+function animate(now){requestAnimationFrame(animate);
+ const dt=clamp((now-lastTick)/1000,0,.05);lastTick=now;const time=now/1000;
+ orbit.update();if(world&&!paused){clockAccum+=dt;let n=0;while(clockAccum>=1/60&&n++<4){
+    decisionClock+=1/60;planCountdown-=1/60;
+    if(needReplan||(planCountdown<=0&&autonomous))planRoute();
+    if(decisionClock>=.10){decisionClock=0;scanLidar();computeDecision();updateStuck(1/10);}
+    applyRobotControl(1/60);world.step();liveFailure();clockAccum-=1/60;
+  }
+  syncObjects();goalMarker.rotation.y+=dt*.45;
+  if(frame%12===0)updateMap();
+ }
+ updateAutofocus(dt);try{renderOptics(time);}catch(e){if(!shaderFault)warn('Render pipeline exception: '+(e?.stack||e));shaderFault=String(e);renderer.setRenderTarget(null);renderer.render(scene,camera);}
+ frames++;if(now-statsT>=700){$('fps').textContent=Math.round(frames*1000/(now-statsT));frames=0;statsT=now;}
+ frame++;
+}
+async function main(){
+ log('Three.js r187 · adaptive embodied robotics · lens model');
+ resize(true);window.addEventListener('resize',()=>resize(true));new ResizeObserver(()=>resize()).observe(view);
+
+ try{
+   const candidates=['https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.21.0/dist/rapier.mjs','https://esm.sh/@dimforge/rapier3d-compat@0.21.0'];
+   let mod,lastErr;for(const u of candidates){try{mod=await import(u);break;}catch(e){lastErr=e;log('Physics CDN retry: '+String(e).slice(0,80));}}
+   if(!mod)throw lastErr||Error('Unable to import Rapier');
+   RAPIER=mod.default||mod;
+   if(typeof RAPIER.init!=='function'&&typeof mod.init==='function'){await mod.init();RAPIER=mod;}
+   else if(typeof RAPIER.init==='function')await RAPIER.init();
+   if(typeof RAPIER.World!=='function')throw Error('Rapier module missing World constructor');
+   makeWorld();status('physics','RAPIER WASM 60 HZ','ok');log('Rapier 3D WASM, full articulated constraints');
+   status('policy','ONLINE LEARNING AVAILABLE','ok');
+   await restoreController(currentKind);
+   setTimeout(()=>{if(!training&&world)startTraining();},1200);
+ }catch(e){status('physics','PHYSICS ERROR','error');warn('Rapier WASM failed to initialize: '+e.message);}
+ requestAnimationFrame(animate);
+}
+main().catch(e=>warn('App initialization: '+e.stack));
+</script>
+</body>
+</html>
